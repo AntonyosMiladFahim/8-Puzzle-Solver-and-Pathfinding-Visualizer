@@ -26,9 +26,4 @@ class Node:
         self.operation_mode = operation_mode
 
     def __lt__(self, other: "Node"):
-        if self.operation_mode == "A":
-            return self.compare_Val < other.compare_Val
-        elif self.operation_mode == "BFS":
-            return self.compare_Val < other.compare_Val
-        elif self.operation_mode == "DFS" or self.operation_mode == "IDFS":
-            return self.compare_Val > other.compare_Val
+        return self.compare_Val < other.compare_Val
