@@ -28,5 +28,5 @@ def unmatching_tiles(Node: node, map: dict[int, tuple[int, int]]):
     val: float = 0
     for row in range(len(Node.state)):
         for col in range(len(Node.state[row])):
-            val += 0 if map.get(Node.state[row][col], (-1, -1))[0] == (row, col) else 1
+            val += 0 if map.get(Node.state[row][col], (-1, -1)) == (row, col) else 1
     return val
