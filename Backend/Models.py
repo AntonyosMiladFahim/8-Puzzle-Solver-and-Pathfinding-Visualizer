@@ -5,7 +5,7 @@ class Node:
     state: List[List[int]]
     cost: float
     compare_Val: float
-    parent: "Node"
+    parent: Optional["Node"] = None
     depth: int
     operation_mode: Literal["BFS", "DFS", "IDFS", "A"]
     zero_x: int
@@ -16,12 +16,12 @@ class Node:
         state: List[List[int]],
         cost: float,
         compare_Val: float,
-        parent: "Node",
+        parent: Optional["Node"],
         depth: int,
         operation_mode: Literal["BFS", "DFS", "IDFS", "A"],
         operation_made: Literal["UP", "DOWN", "LEFT", "RIGHT", "Start"],
         zero_x: int,
-        zero_y: int
+        zero_y: int,
     ) -> None:
         self.state = state
         self.cost = cost
@@ -35,9 +35,9 @@ class Node:
 
     def __lt__(self, other: "Node"):
         if self.operation_mode == "DFS" or self.operation_mode == "IDFS":
-           return self.compare_Val > other.compare_Val
+            return self.compare_Val > other.compare_Val
         else:
-            return self.compare_Val < other.compare_Val 
+            return self.compare_Val < other.compare_Val
 
     def move(self, move: Literal["UP", "DOWN", "LEFT", "RIGHT"]) -> "Node":
         vertical_move = -1 if move == "UP" else 1 if move == "DOWN" else 0
@@ -52,7 +52,6 @@ class Node:
             new_state_list[self.zero_x + vertical_move][self.zero_y + horizontal_move],
             new_state_list[self.zero_x][self.zero_y],
         ]
-
 
         new_state_node = Node(
             state=new_state_list,
