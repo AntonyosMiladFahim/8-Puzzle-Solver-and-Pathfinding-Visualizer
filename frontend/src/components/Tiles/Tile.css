@@ -1,0 +1,28 @@
+.number{
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tile);
+    font-size: 50px;
+    color: wheat;
+    cursor: pointer;
+    transition: left .4s, top .4s; 
+    background: rgba(61, 26, 199, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    transition: left 0.4s;
+
+}
+.number.disabled{
+    pointer-events: none;
+    background-color: transparent;
+}
+
+.number.correct {
+    background-color: var(--correct);
+}

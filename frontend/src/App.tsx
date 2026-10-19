@@ -1,16 +1,11 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
-import Matrix from './components/Matrix'
+import Board from './components/Board/Board'
 
 function App() {
   
 
   return (
     <div className='App'>
-      <Matrix></Matrix>
+      <Board/>
     </div>
   )
 }
