@@ -1,0 +1,16 @@
+.matrix{
+    display: grid;
+    grid-template-columns: repeat(3,100px);
+    grid-template-rows: repeat(3,100);
+    gap: 5px;
+}
+
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: gray;
+    border: 1px solid black;
+    cursor: pointer;
+    border-radius: 20px;
+    
+}
