@@ -6,15 +6,24 @@ from Heuristics import unmatching_tiles
 import json
 
 
+class search_data:
+    explored_nodes: dict[str, float]
+    goal_node: node
+
+    def __init__(self, explored_nodes: dict[str, float], goal_node: node) -> None:
+        self.explored_nodes = explored_nodes
+        self.goal_node = goal_node
+
+
 def search_function(
     start_node: node,
     max_depth: int,
     search_type: Literal["BFS", "DFS", "IDFS", "A"],
     heuristic_function: Callable[[node, dict[int, tuple[int, int]]], float],
     goal: dict[int, tuple[int, int]],
-) -> node | None:
+) -> search_data | None:
     heap = []
-    hash_map = {}
+    hash_map: dict[str, float] = {}
     heapq.heappush(heap, start_node)
 
     # print("enter search funstion")
@@ -29,7 +38,7 @@ def search_function(
         print(current_node.state)
         hash_map[current_state_key] = current_node.compare_Val
         if unmatching_tiles(current_node, goal) == 0:
-            return current_node
+            return search_data(hash_map, current_node)
 
         if current_node.depth < max_depth:
             next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(

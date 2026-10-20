@@ -8,6 +8,7 @@ class Node:
     parent: Optional["Node"] = None
     depth: int
     operation_mode: Literal["BFS", "DFS", "IDFS", "A"]
+    operation_made: Literal["UP", "DOWN", "LEFT", "RIGHT", "Start"]
     zero_x: int
     zero_y: int
 
