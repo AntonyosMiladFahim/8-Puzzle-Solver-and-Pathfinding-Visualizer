@@ -22,13 +22,8 @@ function Board() {
   const [matrix, setMatrix] = useState<Array<tileInfo>>(generate_array());
   console.log(matrix);
 
-  const [answerState, setanswerState] = useState<Array<Array<Array<number>>>>(
-    Array(0),
-  );
-
   function run_algorithm(states: Array<Array<Array<number>>>) {
-    setanswerState(states);
-    solve_puzzle(answerState);
+    solve_puzzle(states);
   }
 
   const delay = (ms: number) =>
