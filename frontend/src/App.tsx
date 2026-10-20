@@ -1,5 +1,5 @@
 import Board from './components/Board/Board'
-
+import ControlPanel from "./components/ControlPanel/ControlPanel"
 function App() {
   
 

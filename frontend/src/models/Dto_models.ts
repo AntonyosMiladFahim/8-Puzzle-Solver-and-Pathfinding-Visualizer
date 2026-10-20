@@ -1,5 +1,5 @@
-type operation_mode = "BFS"|"DFS"|"IDFS"|"A";
-type heuristic = "manhattan"|"euclidean";
+export type operation_mode = "BFS"|"DFS"|"IDFS"|"A";
+export type heuristic = "manhattan"|"euclidean";
 export interface PuzzleRequest{
     state: Array<Array<number>>
     operation_mode: operation_mode
@@ -7,7 +7,7 @@ export interface PuzzleRequest{
 }
 
 
-interface Step{
+export interface Step{
     state: Array<Array<number>>
     move: operation_mode
 }

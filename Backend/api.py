@@ -5,12 +5,26 @@ from Search import search_function
 from Heuristics import manhattan_distance, euclidean_distance
 from solvingWrapper import solveWrapper
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/solve", response_model=Response)
 def solve(request: PuzzleRequest):
+
     goal: dict[int, tuple[int, int]] = {
         0: (0, 0),
         1: (0, 1),
@@ -24,6 +38,7 @@ def solve(request: PuzzleRequest):
     }
     intialState = request.state
     if not is_solvable(intialState):
+        print("Unsolvable")
         raise HTTPException(
             status_code=404, detail="Solution failed: As this state is unsolvable."
         )
