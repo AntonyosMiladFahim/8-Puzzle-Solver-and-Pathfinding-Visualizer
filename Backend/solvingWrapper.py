@@ -38,17 +38,7 @@ class solveWrapper:
         answer: search_data | None = None
 
         start_time = time.perf_counter()
-        if start_node.operation_mode == "IDFS":
-            for i in range(inf):
-                answer = search_function(
-                    start_node, i, start_node.operation_mode, heuristicFucntion, goal
-                )
-                if answer != None:
-                    break
-        else:
-            answer = search_function(
-                start_node, max_depth, operation_mode, heuristicFucntion, goal
-            )
+        answer = search_function(start_node, max_depth, operation_mode, heuristicFucntion, goal)
         end_time = time.perf_counter()
 
         excution_time = end_time - start_time

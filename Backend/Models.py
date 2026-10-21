@@ -35,10 +35,7 @@ class Node:
         self.zero_y = zero_y
 
     def __lt__(self, other: "Node"):
-        if self.operation_mode == "DFS" or self.operation_mode == "IDFS":
-            return self.compare_Val > other.compare_Val
-        else:
-            return self.compare_Val < other.compare_Val
+        return self.compare_Val < other.compare_Val
 
     def move(self, move: Literal["UP", "DOWN", "LEFT", "RIGHT"]) -> "Node":
         vertical_move = -1 if move == "UP" else 1 if move == "DOWN" else 0
