@@ -1,6 +1,6 @@
 import type React from "react";
 import type { tileInfo } from "../Board/Board";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { solve_state } from "../../services/servicesHandler";
 import type {
   PuzzleRequest,
@@ -32,6 +32,42 @@ interface SolutionStats {
   exploredCount: number | null;
 }
 
+function computeInversionInfo(digits: string): {
+  valid: boolean;
+  inversions: number;
+  solvable: boolean;
+} {
+  if (digits.length !== 9) {
+    return { valid: false, inversions: 0, solvable: false };
+  }
+  const set = new Set(digits);
+  if (set.size !== 9) {
+    return { valid: false, inversions: 0, solvable: false };
+  }
+  for (let i = 0; i < 9; i++) {
+    if (!set.has(i.toString())) {
+      return { valid: false, inversions: 0, solvable: false };
+    }
+  }
+
+  // Count inversions excluding 0 (blank tile)
+  const nums = digits.split("").map(Number).filter((n) => n !== 0);
+  let inversions = 0;
+  for (let i = 0; i < nums.length; i++) {
+    for (let j = i + 1; j < nums.length; j++) {
+      if (nums[i] > nums[j]) {
+        inversions++;
+      }
+    }
+  }
+
+  return {
+    valid: true,
+    inversions,
+    solvable: inversions % 2 === 0,
+  };
+}
+
 function ControlPanel({
   matrix,
   setMatrix,
@@ -49,6 +85,9 @@ function ControlPanel({
     useState<heuristic>("manhattan");
   const [algorithm, setAlgorithm] = useState<operation_mode>("BFS");
   const [solutionStats, setSolutionStats] = useState<SolutionStats | null>(null);
+
+  // Real-time inversion calculation
+  const inversionInfo = useMemo(() => computeInversionInfo(newState), [newState]);
 
   function handle_submit_click(event: React.MouseEvent<HTMLButtonElement>) {
     console.log(event.currentTarget);
@@ -90,6 +129,7 @@ function ControlPanel({
       const t: tileInfo = { value: Number.parseInt(c, 10), index: i };
       return t;
     });
+    setnewState(initial_state);
     setMatrix(updated_state);
   }
 
@@ -153,6 +193,25 @@ function ControlPanel({
           Enter the order of numbers you want
           <input type="text" value={newState} onChange={handle_onchange} />
         </label>
+
+        {/* Inversion Counter & Solvability Feedback */}
+        <div className="inversionStatus">
+          {inversionInfo.valid ? (
+            <span
+              className={`inversionBadge ${inversionInfo.solvable ? "solvable" : "unsolvable"}`}
+            >
+              Inversions: <strong>{inversionInfo.inversions}</strong> —{" "}
+              {inversionInfo.solvable
+                ? "Solvable ✓"
+                : "Unsolvable ⚠️ (Odd inversions)"}
+            </span>
+          ) : (
+            <span className="inversionBadge invalid">
+              Enter 9 unique digits (0–8)
+            </span>
+          )}
+        </div>
+
         <div className="button-group">
           <button className="btn-solve" onClick={handle_solve} disabled={isSolving}>
             {isSolving ? "Solving..." : "Solve"}

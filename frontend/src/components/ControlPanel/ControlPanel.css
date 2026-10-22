@@ -1,6 +1,6 @@
 .controlPanel {
-  background: #ffffff;
-  border: 1px solid #e5e5ea;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 22px;
   width: 100%;
@@ -9,40 +9,40 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   box-sizing: border-box;
 }
 
 .header {
   font-size: 17px;
   font-weight: 700;
-  color: #1d1d1f;
+  color: #ffffff;
   letter-spacing: -0.01em;
   padding-bottom: 10px;
-  border-bottom: 1px solid #e5e5ea;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .input {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .input label {
   font-size: 13px;
-  font-weight: 500;
-  color: #86868b;
+  font-weight: 600;
+  color: #8c8c8c;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .input input[type="text"] {
-  background: #f5f5f7;
-  border: 1px solid #d1d1d6;
+  background: #000000;
+  border: 1px solid #333333;
   border-radius: 8px;
   padding: 8px 12px;
-  color: #1d1d1f;
+  color: #ffffff;
   font-family: var(--font-mono, monospace);
   font-size: 14px;
   letter-spacing: 0.1em;
@@ -51,9 +51,42 @@
 }
 
 .input input[type="text"]:focus {
-  border-color: #0066cc;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+  border-color: #e50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25);
+}
+
+/* Inversion Status */
+.inversionStatus {
+  display: flex;
+  align-items: center;
+}
+
+.inversionBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inversionBadge.solvable {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.inversionBadge.unsolvable {
+  background: rgba(229, 9, 20, 0.15);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  color: #ff4d4f;
+}
+
+.inversionBadge.invalid {
+  background: #222222;
+  border: 1px solid #333333;
+  color: #8c8c8c;
 }
 
 .button-group {
@@ -70,15 +103,15 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid #d1d1d6;
-  background: #f5f5f7;
-  color: #1d1d1f;
+  border: 1px solid #383838;
+  background: #262626;
+  color: #ffffff;
   transition: all 0.15s ease;
 }
 
 .button-group button:hover:not(:disabled) {
-  background: #e5e5ea;
-  border-color: #c7c7cc;
+  background: #333333;
+  border-color: #4a4a4a;
 }
 
 .button-group button:disabled {
@@ -86,46 +119,46 @@
   cursor: not-allowed;
 }
 
-/* Primary Solve Button */
+/* Primary Solve Button: #E50914 */
 .button-group .btn-solve {
-  background: #0066cc;
-  border-color: #0066cc;
+  background: #e50914;
+  border-color: #e50914;
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 102, 204, 0.25);
+  box-shadow: 0 2px 10px rgba(229, 9, 20, 0.4);
 }
 
 .button-group .btn-solve:hover:not(:disabled) {
-  background: #0055b3;
-  border-color: #0055b3;
+  background: #b80710;
+  border-color: #b80710;
 }
 
 /* Skip & Stop */
 .button-group .btn-skip {
-  background: #34c759;
-  border-color: #34c759;
+  background: #2a2a2a;
+  border-color: #444444;
   color: #ffffff;
 }
 
 .button-group .btn-skip:hover:not(:disabled) {
-  background: #28a745;
+  background: #383838;
 }
 
 .button-group .btn-stop {
-  background: #ff3b30;
-  border-color: #ff3b30;
+  background: #e50914;
+  border-color: #e50914;
   color: #ffffff;
 }
 
 .button-group .btn-stop:hover:not(:disabled) {
-  background: #e02d23;
+  background: #b80710;
 }
 
 /* Dropdowns */
 .select-algo,
 .select-heuristic {
-  background: #ffffff;
-  border: 1px solid #d1d1d6;
-  color: #1d1d1f;
+  background: #000000;
+  border: 1px solid #333333;
+  color: #ffffff;
   padding: 7px 10px;
   border-radius: 8px;
   font-size: 12px;
@@ -137,29 +170,29 @@
 
 .select-algo:focus,
 .select-heuristic:focus {
-  border-color: #0066cc;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+  border-color: #e50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25);
 }
 
 /* Steps Counter */
 .steps-counter {
   margin-top: 4px;
   font-size: 12px;
-  color: #0066cc;
-  background: #f0f7ff;
-  border: 1px solid rgba(0, 102, 204, 0.2);
+  color: #ff4d4f;
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid rgba(229, 9, 20, 0.3);
   padding: 6px 12px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   width: fit-content;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .steps-counter strong {
   font-family: var(--font-mono, monospace);
-  color: #1d1d1f;
+  color: #ffffff;
 }
 
 /* Solution Stats Display */
@@ -172,9 +205,9 @@
 
 .stat-badge {
   font-size: 12px;
-  color: #86868b;
-  background: #f5f5f7;
-  border: 1px solid #e5e5ea;
+  color: #8c8c8c;
+  background: #222222;
+  border: 1px solid #333333;
   padding: 5px 10px;
   border-radius: 6px;
   display: inline-flex;
@@ -183,9 +216,9 @@
 }
 
 .stat-badge strong {
-  color: #0066cc;
+  color: #ff4d4f;
   font-family: var(--font-mono, monospace);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Speed Controls */
@@ -194,10 +227,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: #f5f5f7;
+  background: #000000;
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid #e5e5ea;
+  border: 1px solid #2a2a2a;
 }
 
 .speed-row {
@@ -205,26 +238,26 @@
   align-items: center;
   gap: 10px;
   font-size: 12px;
-  color: #86868b;
+  color: #8c8c8c;
 }
 
 .speed-row strong {
-  color: #1d1d1f;
+  color: #ffffff;
   font-family: var(--font-mono, monospace);
 }
 
 .speed-slider {
   flex: 1;
-  accent-color: #0066cc;
+  accent-color: #e50914;
   cursor: pointer;
   height: 5px;
 }
 
 .speed-input {
   width: 58px;
-  background: #ffffff;
-  border: 1px solid #d1d1d6;
-  color: #1d1d1f;
+  background: #181818;
+  border: 1px solid #333333;
+  color: #ffffff;
   border-radius: 6px;
   padding: 3px 6px;
   text-align: center;
@@ -234,7 +267,7 @@
 }
 
 .speed-input:focus {
-  border-color: #0066cc;
+  border-color: #e50914;
 }
 
 .presets-row {
@@ -245,28 +278,28 @@
 }
 
 .presets-label {
-  font-size: 11px;
-  color: #86868b;
+  font-size: 12px;
+  color: #8c8c8c;
 }
 
 .preset-btn {
   padding: 3px 7px;
   font-size: 11px;
   font-family: var(--font-mono, monospace);
-  background: #ffffff;
-  border: 1px solid #d1d1d6;
-  color: #1d1d1f;
+  background: #222222;
+  border: 1px solid #333333;
+  color: #ffffff;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .preset-btn:hover {
-  background: #e5e5ea;
+  background: #333333;
 }
 
 .preset-btn.active {
-  background: #0066cc;
-  border-color: #0066cc;
+  background: #e50914;
+  border-color: #e50914;
   color: #ffffff;
 }

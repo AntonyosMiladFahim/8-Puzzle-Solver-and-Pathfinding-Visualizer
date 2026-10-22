@@ -19,6 +19,8 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
     found: boolean;
     cost?: number;
     state?: number[][];
+    nodeNumber?: number;
+    matchingKey?: string;
   } | null>(null);
 
   // Memoize keys so 60k keys are only extracted when exploredNodes changes
@@ -55,9 +57,9 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
   }, [keys, exploredNodes, page]);
 
   const handleSearch = () => {
-    const clean = searchQuery.trim();
+    const clean = searchQuery.replace(/\D/g, "");
     if (clean.length !== 9) {
-      alert("Please enter exactly 9 digits (0-8) to search.");
+      alert("Please enter exactly 9 digits (0 to 8) to search.");
       return;
     }
     const state: number[][] = [
@@ -65,13 +67,50 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
       [Number(clean[3]), Number(clean[4]), Number(clean[5])],
       [Number(clean[6]), Number(clean[7]), Number(clean[8])],
     ];
-    const key = JSON.stringify(state);
-    if (exploredNodes && exploredNodes[key] !== undefined) {
+
+    if (!exploredNodes || totalCount === 0) {
+      setSearchFeedback({ searched: true, found: false, state });
+      return;
+    }
+
+    // Python json.dumps uses space after commas: [[1, 2, 3], [4, 0, 5], [6, 7, 8]]
+    const pythonKey = `[[${state[0].join(", ")}], [${state[1].join(", ")}], [${state[2].join(", ")}]]`;
+    // Standard JS JSON stringify without spaces: [[1,2,3],[4,0,5],[6,7,8]]
+    const jsKey = JSON.stringify(state);
+
+    let cost: number | undefined = undefined;
+    let matchingKey: string | undefined = undefined;
+
+    if (exploredNodes[pythonKey] !== undefined) {
+      cost = exploredNodes[pythonKey];
+      matchingKey = pythonKey;
+    } else if (exploredNodes[jsKey] !== undefined) {
+      cost = exploredNodes[jsKey];
+      matchingKey = jsKey;
+    } else {
+      // Fallback: check matching stripped whitespace
+      const compactTarget = jsKey.replace(/\s+/g, "");
+      const foundEntryKey = keys.find(
+        (k) => k.replace(/\s+/g, "") === compactTarget
+      );
+      if (foundEntryKey !== undefined) {
+        cost = exploredNodes[foundEntryKey];
+        matchingKey = foundEntryKey;
+      }
+    }
+
+    if (cost !== undefined && matchingKey !== undefined) {
+      const foundIndex = keys.indexOf(matchingKey);
+      if (foundIndex !== -1) {
+        setPage(Math.floor(foundIndex / PAGE_SIZE));
+      }
       setSearchFeedback({
         searched: true,
         found: true,
-        cost: exploredNodes[key],
+        cost,
         state,
+        matchingKey,
+        nodeNumber: foundIndex !== -1 ? foundIndex + 1 : undefined,
       });
     } else {
       setSearchFeedback({
@@ -100,7 +139,7 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
         <div className="exploredEmpty">
           <div className="emptyIcon">🔍</div>
           <p className="emptyText">
-            No explored nodes yet. Run an algorithm from the control panel to see the explored state space.
+            No explored nodes yet. Run an algorithm from the control panel to view the explored state space.
           </p>
         </div>
       ) : (
@@ -109,14 +148,15 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
           <div className="searchBox">
             <input
               type="text"
-              placeholder="Search 9 digits (e.g. 123046758)"
+              placeholder="Search 9 digits (e.g. 120345678)"
               maxLength={9}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value.replace(/[^0-8]/g, ""))}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="searchInput"
             />
             <button type="button" onClick={handleSearch} className="searchBtn">
-              Check
+              Search
             </button>
           </div>
 
@@ -124,18 +164,25 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
             <div
               className={`searchResult ${searchFeedback.found ? "found" : "notFound"}`}
             >
-              <span>
-                {searchFeedback.found
-                  ? `✓ State explored! Evaluation: ${searchFeedback.cost}`
-                  : "✗ State was not explored"}
-              </span>
+              <div className="searchResultText">
+                <strong>
+                  {searchFeedback.found
+                    ? `✓ State Explored at Node #${searchFeedback.nodeNumber?.toLocaleString()}`
+                    : "✗ State Was Not Explored"}
+                </strong>
+                {searchFeedback.found && (
+                  <span className="searchResultCost">
+                    Evaluation Value: {searchFeedback.cost}
+                  </span>
+                )}
+              </div>
               {searchFeedback.found && searchFeedback.state && onSelectState && (
                 <button
                   type="button"
                   className="viewStateBtn"
                   onClick={() => onSelectState(searchFeedback.state!)}
                 >
-                  View
+                  View on Board
                 </button>
               )}
             </div>
@@ -143,29 +190,32 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
 
           {/* Paginated grid of explored nodes */}
           <div className="nodesGrid">
-            {currentItems.map((item) => (
-              <div
-                key={item.key}
-                className="nodeCard"
-                onClick={() => onSelectState && onSelectState(item.state)}
-                title="Click to view state on board"
-              >
-                <div className="nodeMeta">
-                  <span className="nodeIndex">#{item.index.toLocaleString()}</span>
-                  <span className="nodeVal">Val: {item.cost}</span>
+            {currentItems.map((item) => {
+              const isMatch = searchFeedback?.found && searchFeedback.matchingKey === item.key;
+              return (
+                <div
+                  key={item.key}
+                  className={`nodeCard ${isMatch ? "matched" : ""}`}
+                  onClick={() => onSelectState && onSelectState(item.state)}
+                  title="Click to view state on board"
+                >
+                  <div className="nodeMeta">
+                    <span className="nodeIndex">#{item.index.toLocaleString()}</span>
+                    <span className="nodeVal">Val: {item.cost}</span>
+                  </div>
+                  <div className="miniGrid">
+                    {item.state.flat().map((num, i) => (
+                      <div
+                        key={i}
+                        className={`miniCell ${num === 0 ? "blank" : ""} ${num === i && num !== 0 ? "goal" : ""}`}
+                      >
+                        {num !== 0 ? num : ""}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="miniGrid">
-                  {item.state.flat().map((num, i) => (
-                    <div
-                      key={i}
-                      className={`miniCell ${num === 0 ? "blank" : ""} ${num === i && num !== 0 ? "goal" : ""}`}
-                    >
-                      {num !== 0 ? num : ""}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Pagination controls */}
@@ -197,4 +247,3 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
 };
 
 export default ExploredNodes;
-

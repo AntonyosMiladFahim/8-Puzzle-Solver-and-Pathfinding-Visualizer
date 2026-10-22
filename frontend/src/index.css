@@ -2,17 +2,19 @@
 
 :root {
   /* Template Palette */
-  --primary: #1D1D1F;
-  --secondary: #0066CC;
-  --neutral: #F5F5F7;
+  --neutral: #141414;
+  --primary: #E50914;
+  --secondary: #000000;
 
   /* Card & Border tokens */
-  --card-bg: #FFFFFF;
-  --border-color: #E5E5EA;
-  --text-muted: #86868B;
+  --card-bg: #181818;
+  --card-surface: #000000;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --text-main: #FFFFFF;
+  --text-muted: #8C8C8C;
 
   --size: 100px;
-  --correct: #0066CC;
+  --correct: #E50914;
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
@@ -25,7 +27,7 @@
 
 html, body {
   background-color: var(--neutral);
-  color: var(--primary);
+  color: var(--text-main);
   font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -43,12 +45,12 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(142, 142, 147, 0.4);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(142, 142, 147, 0.7);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 button, input, select {
