@@ -75,5 +75,6 @@ class solveWrapper:
             cost=ansCost,
             time_taken=excution_time,
             explored_nodes=answer.explored_nodes,
+            explored_order=answer.explored_order,
         )
         return response_entity

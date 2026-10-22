@@ -10,10 +10,17 @@ import json
 class search_data:
     explored_nodes: dict[str, float]
     goal_node: node
+    explored_order: list[list[list[int]]]
 
-    def __init__(self, explored_nodes: dict[str, float], goal_node: node) -> None:
+    def __init__(
+        self,
+        explored_nodes: dict[str, float],
+        goal_node: node,
+        explored_order: list[list[list[int]]] | None = None,
+    ) -> None:
         self.explored_nodes = explored_nodes
         self.goal_node = goal_node
+        self.explored_order = explored_order or []
 
 
 def search_function(
@@ -46,10 +53,10 @@ def A_star(
 ) -> search_data | None:
     heap = []
     hash_map: dict[str, float] = {}
+    explored_order: list[list[list[int]]] = []
     start_node.compare_Val = start_node.cost + heuristic_function(start_node, goal)
     heapq.heappush(heap, start_node)
 
-    # print("enter search funstion")
     while heap:
         current_node: node = heapq.heappop(heap)
         current_state_key = json.dumps(current_node.state)
@@ -57,12 +64,12 @@ def A_star(
         if hash_map.get(current_state_key, (float("inf"))) < current_node.compare_Val:
             continue
 
-        # print("assign hash map val")
-        print(current_node.state)
         hash_map[current_state_key] = current_node.compare_Val
+        if len(explored_order) < 5000:
+            explored_order.append(current_node.state)
 
         if unmatching_tiles(current_node, goal) == 0:
-            return search_data(hash_map, current_node)
+            return search_data(hash_map, current_node, explored_order)
 
         next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
             current_node
@@ -86,14 +93,16 @@ def A_star(
 def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | None:
     queue = deque([start_node])
     hash_map: dict[str, float] = {}
+    explored_order: list[list[list[int]]] = []
     hash_map[json.dumps(start_node.state)] = start_node.compare_Val
 
-    # print("enter search funstion")
     while queue:
         current_node: node = queue.popleft()
+        if len(explored_order) < 5000:
+            explored_order.append(current_node.state)
 
         if unmatching_tiles(current_node, goal) == 0:
-            return search_data(hash_map, current_node)
+            return search_data(hash_map, current_node, explored_order)
 
         next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
             current_node
@@ -116,19 +125,19 @@ def DFS(
 ) -> search_data | None:
     stack = list([start_node])
     hash_map: dict[str, float] = {}
+    explored_order: list[list[list[int]]] = []
     hash_map[json.dumps(start_node.state)] = start_node.compare_Val
 
-    # print("enter search funstion")
     while stack:
         current_node: node = stack.pop()
         current_state_key = json.dumps(current_node.state)
 
-        # print("assign hash map val")
-        print(current_node.state)
         hash_map[current_state_key] = current_node.compare_Val
+        if len(explored_order) < 5000:
+            explored_order.append(current_node.state)
 
         if unmatching_tiles(current_node, goal) == 0:
-            return search_data(hash_map, current_node)
+            return search_data(hash_map, current_node, explored_order)
 
         if current_node.depth >= max_depth:
             continue
