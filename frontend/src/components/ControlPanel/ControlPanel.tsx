@@ -6,12 +6,17 @@ import type {
   PuzzleRequest,
   operation_mode,
   heuristic,
+  Response,
 } from "../../models/Dto_models";
+import "./ControlPanel.css";
 
 type ControlPanelprops = {
   matrix: Array<tileInfo>;
   setMatrix: React.Dispatch<React.SetStateAction<Array<tileInfo>>>;
-  run_algorithm: (states: Array<Array<Array<number>>>) => void;
+  run_algorithm: (
+    states: Array<Array<Array<number>>>,
+    response?: Response | null,
+  ) => void;
   speed: number;
   setSpeed: (speed: number) => void;
   isSolving: boolean;
@@ -20,6 +25,12 @@ type ControlPanelprops = {
   onSkipToEnd: () => void;
   onStop: () => void;
 };
+
+interface SolutionStats {
+  cost: number | null;
+  time_taken: number | null;
+  exploredCount: number | null;
+}
 
 function ControlPanel({
   matrix,
@@ -37,10 +48,11 @@ function ControlPanel({
   const [heuristic_value, setheuristic_value] =
     useState<heuristic>("manhattan");
   const [algorithm, setAlgorithm] = useState<operation_mode>("BFS");
+  const [solutionStats, setSolutionStats] = useState<SolutionStats | null>(null);
 
   function handle_submit_click(event: React.MouseEvent<HTMLButtonElement>) {
     console.log(event.currentTarget);
-    if (newState.length != 9) {
+    if (newState.length !== 9) {
       return;
     }
     const character_set: Set<string> = new Set();
@@ -49,19 +61,18 @@ function ControlPanel({
       character_set.add(c);
     }
 
-    if (character_set.size == 9) {
+    if (character_set.size === 9) {
       const updated: Array<tileInfo> = [...newState].map((c, index) => {
-        const t: tileInfo = { value: Number.parseInt(c), index: index };
+        const t: tileInfo = { value: Number.parseInt(c, 10), index: index };
         return t;
       });
 
       setMatrix(updated);
     }
-    return;
   }
 
   function handle_reset_click() {
-    let initial_state: string = "";
+    let initial_state = "";
     const character_set: Set<string> = new Set();
     for (let i = 0; i < 9; i++) {
       character_set.add(i.toString());
@@ -76,11 +87,12 @@ function ControlPanel({
       console.log(character_set);
     }
     const updated_state: Array<tileInfo> = [...initial_state].map((c, i) => {
-      const t: tileInfo = { value: Number.parseInt(c), index: i };
+      const t: tileInfo = { value: Number.parseInt(c, 10), index: i };
       return t;
     });
     setMatrix(updated_state);
   }
+
   function handle_onchange(e: React.ChangeEvent<HTMLInputElement>) {
     const mutated_state: string = e.target.value;
 
@@ -105,20 +117,28 @@ function ControlPanel({
       request_array[row][col] = matrix[i].value;
     }
 
-    const PuzzleRequest: PuzzleRequest = {
+    const puzzleRequest: PuzzleRequest = {
       state: request_array,
       operation_mode: algorithm,
       heuristic: heuristic_value,
     };
-    solve_state(PuzzleRequest)
+    solve_state(puzzleRequest)
       .then((response) => {
         if (response == null || !response.steps) {
           alert("Could not solve: Either this state is unsolvable or backend returned an error.");
           return;
         } else {
-          const resullt = Array.from(response.steps.map((s) => s.state));
+          const exploredCount = response.explored_nodes
+            ? Object.keys(response.explored_nodes).length
+            : 0;
+          setSolutionStats({
+            cost: response.cost,
+            time_taken: response.time_taken,
+            exploredCount,
+          });
 
-          run_algorithm(resullt);
+          const resullt = Array.from(response.steps.map((s) => s.state));
+          run_algorithm(resullt, response);
         }
       })
       .catch((e) => console.log(e));
@@ -126,15 +146,15 @@ function ControlPanel({
 
   return (
     <div className="controlPanel">
-      <div className="header">Ai Lab 1</div>
+      <div className="header">AI Lab 1 - 8 Puzzle</div>
 
       <div className="input">
         <label>
           Enter the order of numbers you want
           <input type="text" value={newState} onChange={handle_onchange} />
         </label>
-        <div style={{ marginTop: "8px", display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-          <button onClick={handle_solve} disabled={isSolving}>
+        <div className="button-group">
+          <button className="btn-solve" onClick={handle_solve} disabled={isSolving}>
             {isSolving ? "Solving..." : "Solve"}
           </button>
           <button type="submit" onClick={handle_submit_click} disabled={isSolving}>
@@ -148,15 +168,15 @@ function ControlPanel({
             <>
               <button
                 type="button"
+                className="btn-skip"
                 onClick={onSkipToEnd}
-                style={{ backgroundColor: "#28a745", color: "white", fontWeight: "bold" }}
               >
                 Skip to End
               </button>
               <button
                 type="button"
+                className="btn-stop"
                 onClick={onStop}
-                style={{ backgroundColor: "#dc3545", color: "white" }}
               >
                 Stop
               </button>
@@ -164,17 +184,20 @@ function ControlPanel({
           )}
 
           <select
+            className="select-algo"
             onChange={(e) => setAlgorithm(e.target.value as operation_mode)}
             required
             disabled={isSolving}
+            value={algorithm}
           >
             <option label="BFS" value={"BFS"}></option>
             <option label="DFS" value={"DFS"}></option>
             <option label="IDFS" value={"IDFS"}></option>
             <option label="A*" value={"A"}></option>
           </select>
-          {algorithm == "A" && (
+          {algorithm === "A" && (
             <select
+              className="select-heuristic"
               value={heuristic_value}
               onChange={(e) => setheuristic_value(e.target.value as heuristic)}
               required
@@ -187,20 +210,27 @@ function ControlPanel({
         </div>
 
         {totalSteps > 0 && (
-          <div style={{ marginTop: "10px", fontSize: "14px", color: "wheat" }}>
-            Step: <strong>{currentStep}</strong> / <strong>{totalSteps}</strong>
+          <div className="steps-counter">
+            Step: <strong>{currentStep.toLocaleString()}</strong> / <strong>{totalSteps.toLocaleString()}</strong>
           </div>
         )}
 
-        <div
-          style={{
-            marginTop: "14px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        {solutionStats && (
+          <div className="solution-stats">
+            <span className="stat-badge">
+              Cost: <strong>{solutionStats.cost ?? totalSteps}</strong>
+            </span>
+            <span className="stat-badge">
+              Explored Nodes: <strong>{solutionStats.exploredCount?.toLocaleString()}</strong>
+            </span>
+            <span className="stat-badge">
+              Time: <strong>{solutionStats.time_taken != null ? (solutionStats.time_taken < 1 ? `${(solutionStats.time_taken * 1000).toFixed(1)} ms` : `${solutionStats.time_taken.toFixed(3)} s`) : "—"}</strong>
+            </span>
+          </div>
+        )}
+
+        <div className="speed-section">
+          <div className="speed-row">
             <label htmlFor="speed-range">
               Speed: <strong>{speed}x</strong>
             </label>
@@ -212,7 +242,7 @@ function ControlPanel({
               step="1"
               value={Math.min(100, speed)}
               onChange={(e) => setSpeed(Number(e.target.value))}
-              style={{ width: "160px" }}
+              className="speed-slider"
             />
             <input
               type="number"
@@ -220,27 +250,19 @@ function ControlPanel({
               max="1000"
               value={speed}
               onChange={(e) => setSpeed(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
-              style={{ width: "65px", padding: "2px 4px" }}
+              className="speed-input"
             />
             <span>x</span>
           </div>
 
-          <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ fontSize: "12px", color: "#ccc" }}>Presets:</span>
+          <div className="presets-row">
+            <span className="presets-label">Presets:</span>
             {[1, 5, 20, 50, 100, 500, 1000].map((preset) => (
               <button
                 key={preset}
                 type="button"
                 onClick={() => setSpeed(preset)}
-                style={{
-                  padding: "2px 6px",
-                  fontSize: "12px",
-                  backgroundColor: speed === preset ? "#4caf50" : "#555",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
+                className={`preset-btn ${speed === preset ? "active" : ""}`}
               >
                 {preset === 1000 ? "1000x Max" : `${preset}x`}
               </button>
@@ -251,4 +273,5 @@ function ControlPanel({
     </div>
   );
 }
+
 export default ControlPanel;

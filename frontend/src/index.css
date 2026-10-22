@@ -1,22 +1,56 @@
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
-:root{
-  --size : 100px;
-  --correct: #6e50b4
+:root {
+  /* Template Palette */
+  --primary: #1D1D1F;
+  --secondary: #0066CC;
+  --neutral: #F5F5F7;
+
+  /* Card & Border tokens */
+  --card-bg: #FFFFFF;
+  --border-color: #E5E5EA;
+  --text-muted: #86868B;
+
+  --size: 100px;
+  --correct: #0066CC;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-
-html,body{
-  background: rgb(208, 166, 166);
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.App{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-family: 'Pacifico',cursive;
+html, body {
+  background-color: var(--neutral);
+  color: var(--primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-.App * {font-family: 'Pacifico',cursive;}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(142, 142, 147, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(142, 142, 147, 0.7);
+}
+
+button, input, select {
+  font-family: inherit;
+}

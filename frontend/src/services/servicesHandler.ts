@@ -6,7 +6,6 @@
 import axios from "axios";
 
 import type { PuzzleRequest, Response } from "../models/Dto_models";
-import { map } from "framer-motion/client";
 const Base_URL = "http://localhost:8080/solve";
 
 export async function solve_state(

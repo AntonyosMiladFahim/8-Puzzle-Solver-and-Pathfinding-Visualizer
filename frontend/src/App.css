@@ -1,9 +1,8 @@
-
-.App{
+.App {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height :100vh;
-  background-color: black;
-  flex-direction: row;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 24px;
+  background-color: var(--neutral);
 }

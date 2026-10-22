@@ -2,19 +2,21 @@ import { useState, useRef } from "react";
 import "./Board.css";
 import Tile from "../Tiles/Tile";
 import ControlPanel from "../ControlPanel/ControlPanel";
+import ExploredNodes from "../ExploredNodes/ExploredNodes";
+import type { Response } from "../../models/Dto_models";
+
 export interface tileInfo {
   value: number;
   index: number;
 }
+
 function Board() {
   const len = 9;
 
   const generate_array = () => {
     return new Array<tileInfo>(len)
       .fill({ value: 0, index: 0 })
-      .map((_, i) => {
-        return i;
-      })
+      .map((_, i) => i)
       .sort(() => Math.random() - 0.5)
       .map((x, i) => ({ value: x, index: i }));
   };
@@ -24,6 +26,7 @@ function Board() {
   const [isSolving, setIsSolving] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [totalSteps, setTotalSteps] = useState<number>(0);
+  const [exploredNodes, setExploredNodes] = useState<Record<string, number> | null>(null);
 
   const speedRef = useRef<number>(1);
   const isRunningRef = useRef<boolean>(false);
@@ -44,9 +47,21 @@ function Board() {
     setIsSolving(false);
   };
 
-  function run_algorithm(states: Array<Array<Array<number>>>) {
+  function run_algorithm(
+    states: Array<Array<Array<number>>>,
+    response?: Response | null,
+  ) {
+    if (response?.explored_nodes) {
+      setExploredNodes(response.explored_nodes);
+    }
     solve_puzzle(states);
   }
+
+  const handleSelectExploredState = (stateArray: number[][]) => {
+    handleStop();
+    const flat = stateArray.flat();
+    setMatrix(flat.map((val, idx) => ({ value: val, index: idx })));
+  };
 
   const delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -123,33 +138,51 @@ function Board() {
   };
 
   return (
-    <div>
-      <ControlPanel
-        setMatrix={(val) => {
-          handleStop();
-          setMatrix(val);
-        }}
-        matrix={matrix}
-        run_algorithm={run_algorithm}
-        speed={speed}
-        setSpeed={handleSpeedChange}
-        isSolving={isSolving}
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        onSkipToEnd={handleSkipToEnd}
-        onStop={handleStop}
-      />
-      <div className="Board">
-        {matrix.map((tileInfo) => (
-          <Tile
-            key={tileInfo.value}
-            val={tileInfo.value}
-            index={tileInfo.index}
-            speed={speed}
-          />
-        ))}
+    <div className="appLayout">
+      {/* Left side: Control Panel on top, Visualized State (Board) under it */}
+      <div className="leftColumn">
+        <ControlPanel
+          setMatrix={(val) => {
+            handleStop();
+            setMatrix(val);
+          }}
+          matrix={matrix}
+          run_algorithm={run_algorithm}
+          speed={speed}
+          setSpeed={handleSpeedChange}
+          isSolving={isSolving}
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          onSkipToEnd={handleSkipToEnd}
+          onStop={handleStop}
+        />
+        <div className="boardCard">
+          <div className="boardCardHeader">
+            <span className="boardCardTitle">Visualized State</span>
+            <span className="boardCardBadge">3×3 Grid</span>
+          </div>
+          <div className="Board">
+            {matrix.map((tileInfo) => (
+              <Tile
+                key={tileInfo.value}
+                val={tileInfo.value}
+                index={tileInfo.index}
+                speed={speed}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right side: Explored Nodes Component */}
+      <div className="rightColumn">
+        <ExploredNodes
+          exploredNodes={exploredNodes}
+          onSelectState={handleSelectExploredState}
+        />
       </div>
     </div>
   );
 }
+
 export default Board;
