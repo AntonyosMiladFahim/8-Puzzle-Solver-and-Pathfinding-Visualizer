@@ -34,11 +34,13 @@ class solveWrapper:
         else:
             heuristicFucntion = euclidean_distance
 
-        inf = 1000000000000000
+        inf = float("inf")
         answer: search_data | None = None
 
         start_time = time.perf_counter()
-        answer = search_function(start_node, max_depth, operation_mode, heuristicFucntion, goal)
+        answer = search_function(
+            start_node, max_depth, operation_mode, heuristicFucntion, goal
+        )
         end_time = time.perf_counter()
 
         excution_time = end_time - start_time
@@ -69,6 +71,9 @@ class solveWrapper:
         stepsList.reverse()
 
         response_entity: Response = Response(
-            steps=stepsList, cost=ansCost, time_taken=excution_time
+            steps=stepsList,
+            cost=ansCost,
+            time_taken=excution_time,
+            explored_nodes=answer.explored_nodes,
         )
         return response_entity

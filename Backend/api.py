@@ -47,6 +47,7 @@ def solve(request: PuzzleRequest):
         request=request, max_depth=inf, goal=goal
     )
     print(Response.time_taken)
+    print(Response.explored_nodes)
     return Response
 
 
