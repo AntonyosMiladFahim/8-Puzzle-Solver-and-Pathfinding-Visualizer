@@ -71,10 +71,43 @@
   box-sizing: content-box;
 }
 
-/* Right side: Explored Nodes Component */
+/* Right side: Explored Nodes & Search Tree Component */
 .rightColumn {
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 440px;
+}
+
+.tabGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  background: #181818;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 7px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  color: #8c8c8c;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabBtn:hover {
+  color: #ffffff;
+}
+
+.tabBtn.active {
+  background: #e50914;
+  color: #ffffff;
 }

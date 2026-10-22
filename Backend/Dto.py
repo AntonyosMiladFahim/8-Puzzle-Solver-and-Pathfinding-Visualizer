@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Tuple
 
 
 class PuzzleRequest(BaseModel):
@@ -19,3 +19,4 @@ class Response(BaseModel):
     time_taken: float | None = None
     explored_nodes: dict[str, float] | None = None
     explored_order: List[List[List[int]]] | None = None
+    tree_nodes: List[Tuple[str, int, str, float]] | None = None

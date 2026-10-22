@@ -16,6 +16,7 @@ type ControlPanelprops = {
   run_algorithm: (
     states: Array<Array<Array<number>>>,
     response?: Response | null,
+    operationMode?: operation_mode,
   ) => void;
   speed: number;
   setSpeed: (speed: number) => void;
@@ -178,7 +179,7 @@ function ControlPanel({
           });
 
           const resullt = Array.from(response.steps.map((s) => s.state));
-          run_algorithm(resullt, response);
+          run_algorithm(resullt, response, algorithm);
         }
       })
       .catch((e) => console.log(e));

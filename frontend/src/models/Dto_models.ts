@@ -18,4 +18,6 @@ export interface Response {
   cost: number;
   time_taken: number;
   explored_nodes: Record<string, number>;
+  explored_order?: Array<Array<Array<number>>>;
+  tree_nodes?: Array<[string, number, string, number]>;
 }

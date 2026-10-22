@@ -1,6 +1,6 @@
 import heapq
 from Models import Node as node
-from typing import Literal
+from typing import Literal, Tuple
 from collections.abc import Callable
 from collections import deque
 from Heuristics import unmatching_tiles
@@ -11,16 +11,19 @@ class search_data:
     explored_nodes: dict[str, float]
     goal_node: node
     explored_order: list[list[list[int]]]
+    tree_nodes: list[Tuple[str, int, str, float]]
 
     def __init__(
         self,
         explored_nodes: dict[str, float],
         goal_node: node,
         explored_order: list[list[list[int]]] | None = None,
+        tree_nodes: list[Tuple[str, int, str, float]] | None = None,
     ) -> None:
         self.explored_nodes = explored_nodes
         self.goal_node = goal_node
         self.explored_order = explored_order or []
+        self.tree_nodes = tree_nodes or []
 
 
 def search_function(
@@ -54,6 +57,9 @@ def A_star(
     heap = []
     hash_map: dict[str, float] = {}
     explored_order: list[list[list[int]]] = []
+    tree_nodes: list[Tuple[str, int, str, float]] = []
+    state_to_idx: dict[str, int] = {}
+
     start_node.compare_Val = start_node.cost + heuristic_function(start_node, goal)
     heapq.heappush(heap, start_node)
 
@@ -68,12 +74,16 @@ def A_star(
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 
-        if unmatching_tiles(current_node, goal) == 0:
-            return search_data(hash_map, current_node, explored_order)
+        curr_str = "".join(str(n) for row in current_node.state for n in row)
+        parent_str = "".join(str(n) for row in current_node.parent.state for n in row) if current_node.parent else None
+        p_idx = state_to_idx.get(parent_str, -1) if parent_str else -1
+        state_to_idx[curr_str] = len(tree_nodes)
+        tree_nodes.append((curr_str, p_idx, current_node.operation_made, current_node.compare_Val))
 
-        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
-            current_node
-        )
+        if unmatching_tiles(current_node, goal) == 0:
+            return search_data(hash_map, current_node, explored_order, tree_nodes)
+
+        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(current_node)
         next_nodes: list[node] = []
         for state in next_states:
             next_node = current_node.move(move=state)
@@ -94,6 +104,8 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
     queue = deque([start_node])
     hash_map: dict[str, float] = {}
     explored_order: list[list[list[int]]] = []
+    tree_nodes: list[Tuple[str, int, str, float]] = []
+    state_to_idx: dict[str, int] = {}
     hash_map[json.dumps(start_node.state)] = start_node.compare_Val
 
     while queue:
@@ -101,12 +113,16 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 
-        if unmatching_tiles(current_node, goal) == 0:
-            return search_data(hash_map, current_node, explored_order)
+        curr_str = "".join(str(n) for row in current_node.state for n in row)
+        parent_str = "".join(str(n) for row in current_node.parent.state for n in row) if current_node.parent else None
+        p_idx = state_to_idx.get(parent_str, -1) if parent_str else -1
+        state_to_idx[curr_str] = len(tree_nodes)
+        tree_nodes.append((curr_str, p_idx, current_node.operation_made, current_node.compare_Val))
 
-        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
-            current_node
-        )
+        if unmatching_tiles(current_node, goal) == 0:
+            return search_data(hash_map, current_node, explored_order, tree_nodes)
+
+        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(current_node)
         next_nodes: list[node] = []
         for state in next_states:
             next_node = current_node.move(move=state)
@@ -126,6 +142,8 @@ def DFS(
     stack = list([start_node])
     hash_map: dict[str, float] = {}
     explored_order: list[list[list[int]]] = []
+    tree_nodes: list[Tuple[str, int, str, float]] = []
+    state_to_idx: dict[str, int] = {}
     hash_map[json.dumps(start_node.state)] = start_node.compare_Val
 
     while stack:
@@ -136,15 +154,19 @@ def DFS(
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 
+        curr_str = "".join(str(n) for row in current_node.state for n in row)
+        parent_str = "".join(str(n) for row in current_node.parent.state for n in row) if current_node.parent else None
+        p_idx = state_to_idx.get(parent_str, -1) if parent_str else -1
+        state_to_idx[curr_str] = len(tree_nodes)
+        tree_nodes.append((curr_str, p_idx, current_node.operation_made, current_node.compare_Val))
+
         if unmatching_tiles(current_node, goal) == 0:
-            return search_data(hash_map, current_node, explored_order)
+            return search_data(hash_map, current_node, explored_order, tree_nodes)
 
         if current_node.depth >= max_depth:
             continue
 
-        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
-            current_node
-        )
+        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(current_node)
         next_states.reverse()
         next_nodes: list[node] = []
         for state in next_states:

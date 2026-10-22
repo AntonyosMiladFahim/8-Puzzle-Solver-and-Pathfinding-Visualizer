@@ -1,11 +1,6 @@
-/**
- * TODO
- * an axiom api that pings
- * localhost:
- */
 import axios from "axios";
-
 import type { PuzzleRequest, Response } from "../models/Dto_models";
+
 const Base_URL = "http://localhost:8080/solve";
 
 export async function solve_state(
@@ -16,14 +11,14 @@ export async function solve_state(
     .post<Response>(Base_URL, PuzzleRequest)
     .then((api_response) => {
       const data = api_response.data;
-      const mapped_data: Response = {
+      response = {
         cost: data.cost,
         steps: data.steps,
         time_taken: data.time_taken,
         explored_nodes: data.explored_nodes,
+        explored_order: data.explored_order,
+        tree_nodes: data.tree_nodes,
       };
-      console.log(mapped_data);
-      response = mapped_data;
     })
     .catch((error) => {
       console.log(error);

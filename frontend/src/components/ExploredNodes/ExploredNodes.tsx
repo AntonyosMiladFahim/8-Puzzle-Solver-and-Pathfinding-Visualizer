@@ -201,7 +201,7 @@ export const ExploredNodes: React.FC<ExploredNodesProps> = ({
                 >
                   <div className="nodeMeta">
                     <span className="nodeIndex">#{item.index.toLocaleString()}</span>
-                    <span className="nodeVal">Val: {item.cost}</span>
+                    <span className="nodeVal">Val: {item.cost.toPrecision(3)}</span>
                   </div>
                   <div className="miniGrid">
                     {item.state.flat().map((num, i) => (

@@ -3,7 +3,8 @@ import "./Board.css";
 import Tile from "../Tiles/Tile";
 import ControlPanel from "../ControlPanel/ControlPanel";
 import ExploredNodes from "../ExploredNodes/ExploredNodes";
-import type { Response } from "../../models/Dto_models";
+import SearchTree from "../SearchTree/SearchTree";
+import type { Response, operation_mode } from "../../models/Dto_models";
 
 export interface tileInfo {
   value: number;
@@ -26,7 +27,11 @@ function Board() {
   const [isSolving, setIsSolving] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [totalSteps, setTotalSteps] = useState<number>(0);
+  const [solutionSteps, setSolutionSteps] = useState<Array<Array<Array<number>>>>([]);
   const [exploredNodes, setExploredNodes] = useState<Record<string, number> | null>(null);
+  const [treeNodes, setTreeNodes] = useState<Array<[string, number, string, number]> | null>(null);
+  const [operationMode, setOperationMode] = useState<operation_mode>("BFS");
+  const [activeRightTab, setActiveRightTab] = useState<"tree" | "nodes">("tree");
 
   const speedRef = useRef<number>(1);
   const isRunningRef = useRef<boolean>(false);
@@ -50,9 +55,17 @@ function Board() {
   function run_algorithm(
     states: Array<Array<Array<number>>>,
     response?: Response | null,
+    mode?: operation_mode,
   ) {
+    setSolutionSteps(states);
     if (response?.explored_nodes) {
       setExploredNodes(response.explored_nodes);
+    }
+    if (response?.tree_nodes) {
+      setTreeNodes(response.tree_nodes);
+    }
+    if (mode) {
+      setOperationMode(mode);
     }
     solve_puzzle(states);
   }
@@ -174,12 +187,39 @@ function Board() {
         </div>
       </div>
 
-      {/* Right side: Explored Nodes Component */}
+      {/* Right side: Search Tree & Explored Nodes */}
       <div className="rightColumn">
-        <ExploredNodes
-          exploredNodes={exploredNodes}
-          onSelectState={handleSelectExploredState}
-        />
+        <div className="tabGroup">
+          <button
+            type="button"
+            className={`tabBtn ${activeRightTab === "tree" ? "active" : ""}`}
+            onClick={() => setActiveRightTab("tree")}
+          >
+            Search Tree {treeNodes ? `(${treeNodes.length})` : ""}
+          </button>
+          <button
+            type="button"
+            className={`tabBtn ${activeRightTab === "nodes" ? "active" : ""}`}
+            onClick={() => setActiveRightTab("nodes")}
+          >
+            Explored Nodes {exploredNodes ? `(${Object.keys(exploredNodes).length})` : ""}
+          </button>
+        </div>
+
+        {activeRightTab === "tree" ? (
+          <SearchTree
+            treeNodes={treeNodes || undefined}
+            solutionSteps={solutionSteps}
+            currentStepIndex={currentStep}
+            onSelectState={handleSelectExploredState}
+            operationMode={operationMode}
+          />
+        ) : (
+          <ExploredNodes
+            exploredNodes={exploredNodes}
+            onSelectState={handleSelectExploredState}
+          />
+        )}
       </div>
     </div>
   );
