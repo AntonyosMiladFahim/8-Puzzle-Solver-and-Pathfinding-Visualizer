@@ -39,7 +39,11 @@ def search_function(
     return None
 
 
-def A_star(start_node: node, heuristic_function: Callable[[node, dict[int, tuple[int, int]]], float], goal: dict[int, tuple[int, int]]) -> search_data | None:
+def A_star(
+    start_node: node,
+    heuristic_function: Callable[[node, dict[int, tuple[int, int]]], float],
+    goal: dict[int, tuple[int, int]],
+) -> search_data | None:
     heap = []
     hash_map: dict[str, float] = {}
     start_node.compare_Val = start_node.cost + heuristic_function(start_node, goal)
@@ -101,17 +105,18 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
 
         for next_node in next_nodes:
             next_state_key = json.dumps(next_node.state)
-            if (not (next_state_key in hash_map)):
+            if not (next_state_key in hash_map):
                 hash_map[next_state_key] = next_node.compare_Val
                 queue.append(next_node)
     return None
-    
-def DFS(start_node: node,  max_depth: int, goal: dict[int, tuple[int, int]]) -> search_data | None:
+
+
+def DFS(
+    start_node: node, max_depth: int, goal: dict[int, tuple[int, int]]
+) -> search_data | None:
     stack = list([start_node])
     hash_map: dict[str, float] = {}
     hash_map[json.dumps(start_node.state)] = start_node.compare_Val
-
-    
 
     # print("enter search funstion")
     while stack:
@@ -125,7 +130,7 @@ def DFS(start_node: node,  max_depth: int, goal: dict[int, tuple[int, int]]) -> 
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node)
 
-        if(current_node.depth >= max_depth):
+        if current_node.depth >= max_depth:
             continue
 
         next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
@@ -139,7 +144,7 @@ def DFS(start_node: node,  max_depth: int, goal: dict[int, tuple[int, int]]) -> 
 
         for next_node in next_nodes:
             next_state_key = json.dumps(next_node.state)
-            if (not (next_state_key in hash_map)):
+            if not (next_state_key in hash_map):
                 hash_map[next_state_key] = next_node.compare_Val
                 stack.append(next_node)
 

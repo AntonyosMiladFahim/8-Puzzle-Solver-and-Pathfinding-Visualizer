@@ -18,3 +18,4 @@ class Response(BaseModel):
     steps: List[Step] | None = None
     cost: float | None = None
     time_taken: float | None = None
+    explored_nodes: dict[str, float] | None = None

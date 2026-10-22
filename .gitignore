@@ -20,3 +20,4 @@ pip-selfcheck.json
 [Ss]cripts
 
 ./node_modules
+/Backend/__pycache__
