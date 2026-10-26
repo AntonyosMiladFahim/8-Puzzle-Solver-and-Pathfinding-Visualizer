@@ -1,9 +1,10 @@
 import { useRef } from "react";
-import { PathfindingProvider } from "./context/PathfindinContext";
-import { SpeedProvider } from "./context/SpeedContext";
-import { TileProvider } from "./context/TileContext";
-import { Grid } from "./PathFindingComponents/Grid";
-import { Nav } from "./PathFindingComponents/Nav";
+import { PathfindingProvider } from "./Pathfinding_Part/context/PathfindinContext";
+import { TileProvider } from "./Pathfinding_Part/context/TileContext";
+import { SpeedProvider } from "./Pathfinding_Part/context/SpeedContext";
+import { Nav } from "./Pathfinding_Part/PathFindingComponents/Nav";
+import { Grid } from "./Pathfinding_Part/PathFindingComponents/Grid";
+
 function App() {
   const isVisualizationRunningRef = useRef(false);
   return (

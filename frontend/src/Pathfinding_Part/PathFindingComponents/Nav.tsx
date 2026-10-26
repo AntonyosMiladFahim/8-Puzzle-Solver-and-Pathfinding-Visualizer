@@ -5,11 +5,15 @@ import type { MazeType } from "../utils/types";
 import { resetGrid } from "../utils/resetGrid";
 import { useTile } from "../hooks/UseTile";
 import { useState } from "react";
+import { runMazeAlgorithm } from "../utils/runMazeAlgorithm";
+import { useSpeed } from "../hooks/useSpeed";
 
 export function Nav() {
   const [isDisabled, setIsDisabled] = useState(false);
-  const { maze, setMaze, grid } = usePathfinding();
+  const { maze, setMaze, grid, setGrid, setIsGraphVisualized } =
+    usePathfinding();
   const { startTile, endTile } = useTile();
+  const { speed } = useSpeed();
   const handleGenerateMaze = (maze: MazeType) => {
     if (maze === "NONE") {
       setMaze(maze);
@@ -19,6 +23,10 @@ export function Nav() {
     setMaze(maze);
     setIsDisabled(true);
     //run maze algorithm;
+    runMazeAlgorithm({ maze, grid, startTile, endTile, setIsDisabled, speed });
+    const newGrid = grid.slice();
+    setGrid(newGrid);
+    setIsGraphVisualized(false);
   };
   return (
     <div
