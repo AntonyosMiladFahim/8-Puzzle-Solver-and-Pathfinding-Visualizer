@@ -1,4 +1,4 @@
-import { Children, createContext, useState, type ReactNode } from "react";
+import { createContext, useState, type ReactNode } from "react";
 import type { TileType } from "../utils/types";
 import {
   END_TILE_CONFIGURATION,

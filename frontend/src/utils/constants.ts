@@ -1,4 +1,4 @@
-import type { TileType } from "./types";
+import type { MazeSelectType, TileType } from "./types";
 
 export const MAX_ROWS = 39;
 export const MAX_COLS = 49;
@@ -26,3 +26,21 @@ export const END_TILE_CONFIGURATION = {
   isTraversed: false,
   parent: null,
 };
+
+export const TILE_STYLE =
+  "lg:w-[17px] md:w-[15px] xs:w-[8px] w-[7px] lg:h-[17px] md:h-[15px] xs:h-[8px] h-[7px] border-t border-r border-sky-200";
+
+export const TRAVERSED_TILE_STYLE = TILE_STYLE + " bg-syan-400";
+export const START_TILE_STYLE = TILE_STYLE + " bg-green-400";
+export const END_TILE_STYLE = TILE_STYLE + " bg-red-400";
+export const WALL_TILE_STYLE = TILE_STYLE + " bg-gray-400";
+export const PATH_TILE_STYLE = TILE_STYLE + " bg-yellow-500";
+
+export const MAZES: MazeSelectType[] = [
+  { name: "no Maze", value: "NONE" },
+  { name: "Binary Tree", value: "BINARY_TREE" },
+  {
+    name: "Recursive division",
+    value: "RECURSIVE_DIVISION",
+  },
+];

@@ -1,9 +1,21 @@
-import Board from "./components/Board/Board";
+import { useRef } from "react";
 import { PathfindingProvider } from "./context/PathfindinContext";
+import { SpeedProvider } from "./context/SpeedContext";
+import { TileProvider } from "./context/TileContext";
+import { Grid } from "./PathFindingComponents/Grid";
+import { Nav } from "./PathFindingComponents/Nav";
 function App() {
+  const isVisualizationRunningRef = useRef(false);
   return (
     <PathfindingProvider>
-      <h1 className="text-3xl font-bold underline h-screen w-screen bg-blue-500"></h1>
+      <TileProvider>
+        <SpeedProvider>
+          <div className="h-screen w-screen flex flex-col">
+            <Nav />
+            <Grid isVisualizedRunningRef={isVisualizationRunningRef} />
+          </div>
+        </SpeedProvider>
+      </TileProvider>
     </PathfindingProvider>
     // <div className='App'>
     //   <Board/>
