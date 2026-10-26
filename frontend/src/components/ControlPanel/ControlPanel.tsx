@@ -305,7 +305,7 @@ function ControlPanel({
                 type="button"
                 className="btn-step"
                 onClick={onStepBackward}
-                disabled={currentStep <= 1}
+                disabled={currentStep <= 0}
                 title="Step Backward"
               >
                 ◀ Prev

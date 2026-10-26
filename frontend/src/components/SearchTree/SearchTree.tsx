@@ -63,7 +63,7 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
         id: i,
         stateStr,
         parentIdx,
-        move: move || "S",
+        move: ({ UP: "DOWN", DOWN: "UP", LEFT: "RIGHT", RIGHT: "LEFT" } as Record<string, string>)[move] ?? (move || "S"),
         val,
         depth,
         x: 0,
@@ -601,16 +601,6 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
           >
             {autoFocus ? "● Follow ON" : "○ Free Pan"}
           </button>
-          {activeNode && (
-            <button
-              type="button"
-              className="treeBtn"
-              onClick={focusActive}
-              title="Focus camera on current solution node"
-            >
-              Focus Path
-            </button>
-          )}
           <button type="button" className="treeBtn" onClick={fitTree} title="Fit full tree in view">
             Fit All
           </button>

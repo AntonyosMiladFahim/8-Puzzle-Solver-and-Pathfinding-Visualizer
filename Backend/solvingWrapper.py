@@ -56,14 +56,10 @@ class solveWrapper:
             move: Literal["UP", "DOWN", "LEFT", "RIGHT", "Start"] = (
                 goal_state.operation_made
             )
-            if move == "UP":
-                move = "DOWN"
-            elif move == "DOWN":
-                move = "UP"
-            elif move == "RIGHT":
-                move = "LEFT"
-            elif move == "LEFT":
-                move = "RIGHT"
+            if move == "UP": move = "DOWN"
+            elif move == "DOWN": move = "UP"
+            elif move == "LEFT": move = "RIGHT"
+            elif move == "RIGHT": move = "LEFT"
 
             step = Step(state=goal_state.state, move=move)
             stepsList.append(step)

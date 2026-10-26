@@ -38,6 +38,8 @@ function Board() {
   const skipToEndRef = useRef<boolean>(false);
   const runIdRef = useRef<number>(0);
 
+  const [initialMatrix, setInitialMatrix] = useState<Array<tileInfo>>(matrix);
+
   const handleSpeedChange = (newSpeed: number) => {
     setSpeed(newSpeed);
     speedRef.current = newSpeed;
@@ -68,12 +70,17 @@ function Board() {
   };
 
   const handleStepBackward = () => {
-    if (solutionSteps.length === 0) return;
+    if (solutionSteps.length === 0 || currentStep <= 0) return;
     handleStop();
-    const prevIdx = Math.max(0, currentStep - 2);
-    const state = solutionSteps[prevIdx].flat();
-    setMatrix(state.map((val, idx) => ({ value: val, index: idx })));
-    setCurrentStep(prevIdx + 1);
+    if (currentStep === 1) {
+      setMatrix(initialMatrix);
+      setCurrentStep(0);
+    } else {
+      const prevIdx = currentStep - 2;
+      const state = solutionSteps[prevIdx].flat();
+      setMatrix(state.map((val, idx) => ({ value: val, index: idx })));
+      setCurrentStep(prevIdx + 1);
+    }
   };
 
   function run_algorithm(
@@ -81,6 +88,7 @@ function Board() {
     response?: Response | null,
     mode?: operation_mode,
   ) {
+    setInitialMatrix(matrix);
     setSolutionSteps(states);
     if (response?.explored_nodes) {
       setExploredNodes(response.explored_nodes);

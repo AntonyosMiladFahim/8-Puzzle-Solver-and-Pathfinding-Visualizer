@@ -7,6 +7,7 @@ from Heuristics import unmatching_tiles
 import json
 
 
+# holds the result of any search: visited nodes, the goal node, exploration order, and tree structure
 class search_data:
     explored_nodes: dict[str, float]
     goal_node: node
@@ -26,6 +27,7 @@ class search_data:
         self.tree_nodes = tree_nodes or []
 
 
+# routes to the right algorithm based on search type
 def search_function(
     start_node: node,
     max_depth: int,
@@ -41,6 +43,7 @@ def search_function(
     elif search_type == "DFS":
         return DFS(start_node, max_depth, goal)
     elif search_type == "IDFS":
+        # run DFS with increasing depth limits until a solution is found
         for depth_limit in range(max_depth + 1):
             result = DFS(start_node, depth_limit, goal)
             if result is not None:
@@ -60,20 +63,25 @@ def A_star(
     tree_nodes: list[Tuple[str, int, str, float]] = []
     state_to_idx: dict[str, int] = {}
 
+    # f(n) = g(n) + h(n) for start node
     start_node.compare_Val = start_node.cost + heuristic_function(start_node, goal)
     heapq.heappush(heap, start_node)
 
     while heap:
+        # pop the node with the lowest f(n)
         current_node: node = heapq.heappop(heap)
         current_state_key = json.dumps(current_node.state)
 
+        # skip if we already found a cheaper path to this state
         if hash_map.get(current_state_key, (float("inf"))) < current_node.compare_Val:
             continue
 
         hash_map[current_state_key] = current_node.compare_Val
+        # record up to 5000 states for the UI explored-nodes panel
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 
+        # build tree node entry
         curr_str = "".join(str(n) for row in current_node.state for n in row)
         parent_str = (
             "".join(str(n) for row in current_node.parent.state for n in row)
@@ -86,9 +94,11 @@ def A_star(
             (curr_str, p_idx, current_node.operation_made, current_node.compare_Val)
         )
 
+        # goal check
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node, explored_order, tree_nodes)
 
+        # get valid moves and expand children
         next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
             current_node
         )
@@ -98,8 +108,10 @@ def A_star(
             next_nodes.append(next_node)
 
         for next_node in next_nodes:
+            # compute f(n) for the child
             next_node.compare_Val = next_node.cost + heuristic_function(next_node, goal)
             next_state_key = json.dumps(next_node.state)
+            # only push if this path is better than any known path to the same state
             if (not (next_state_key in hash_map)) or hash_map.get(
                 next_state_key, (float("inf"))
             ) > next_node.compare_Val:
@@ -114,6 +126,7 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
     explored_order: list[list[list[int]]] = []
     tree_nodes: list[Tuple[str, int, str, float]] = []
     state_to_idx: dict[str, int] = {}
+    # mark start as visited
     hash_map[json.dumps(start_node.state)] = start_node.compare_Val
 
     while queue:
@@ -121,6 +134,7 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 
+        # build tree node entry
         curr_str = "".join(str(n) for row in current_node.state for n in row)
         parent_str = (
             "".join(str(n) for row in current_node.parent.state for n in row)
@@ -133,9 +147,11 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
             (curr_str, p_idx, current_node.operation_made, current_node.compare_Val)
         )
 
+        # goal check
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node, explored_order, tree_nodes)
 
+        # get valid moves and queue unvisited children
         next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
             current_node
         )
@@ -146,6 +162,7 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
 
         for next_node in next_nodes:
             next_state_key = json.dumps(next_node.state)
+            # skip already-visited states
             if not (next_state_key in hash_map):
                 hash_map[next_state_key] = next_node.compare_Val
                 queue.append(next_node)
@@ -165,13 +182,15 @@ def DFS(
         current_node: node = stack.pop()
         current_state_key = json.dumps(current_node.state)
 
-        if hash_map.get(current_state_key, float("inf")) <= current_node.depth:   # AFTER
+        # skip if we already reached this state at an equal or shallower depth
+        if hash_map.get(current_state_key, float("inf")) <= current_node.depth:
             continue
         hash_map[current_state_key] = current_node.depth
         
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 
+        # build tree node entry
         curr_str = "".join(str(n) for row in current_node.state for n in row)
         parent_str = (
             "".join(str(n) for row in current_node.parent.state for n in row)
@@ -184,12 +203,15 @@ def DFS(
             (curr_str, p_idx, current_node.operation_made, current_node.compare_Val)
         )
 
+        # goal check
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node, explored_order, tree_nodes)
 
+        # depth limit reached, no need to expand further
         if current_node.depth >= max_depth:
             continue
 
+        # get valid moves, reverse so the stack pops in the original order
         next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
             current_node
         )
@@ -199,6 +221,7 @@ def DFS(
             next_node = current_node.move(move=state)
             next_nodes.append(next_node)
 
+        # push children that are not visited at a shallower depth
         for next_node in next_nodes:
             next_state_key = json.dumps(next_node.state)
             if (
@@ -210,6 +233,7 @@ def DFS(
     return None
 
 
+# returns valid blank moves based on blank's position
 def get_next_states(current_node: node) -> list[Literal["UP", "DOWN", "LEFT", "RIGHT"]]:
     next_moves: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = []
 
