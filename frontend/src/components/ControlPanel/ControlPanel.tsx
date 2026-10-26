@@ -25,6 +25,9 @@ type ControlPanelprops = {
   totalSteps: number;
   onSkipToEnd: () => void;
   onStop: () => void;
+  onContinue?: () => void;
+  onStepForward?: () => void;
+  onStepBackward?: () => void;
 };
 
 interface SolutionStats {
@@ -80,12 +83,16 @@ function ControlPanel({
   totalSteps,
   onSkipToEnd,
   onStop,
+  onContinue,
+  onStepForward,
+  onStepBackward,
 }: ControlPanelprops) {
   const [newState, setnewState] = useState<string>("012345678");
   const [heuristic_value, setheuristic_value] =
     useState<heuristic>("manhattan");
   const [algorithm, setAlgorithm] = useState<operation_mode>("BFS");
   const [solutionStats, setSolutionStats] = useState<SolutionStats | null>(null);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // Real-time inversion calculation
   const inversionInfo = useMemo(() => computeInversionInfo(newState), [newState]);
@@ -163,6 +170,7 @@ function ControlPanel({
       operation_mode: algorithm,
       heuristic: heuristic_value,
     };
+    setIsCalculating(true);
     solve_state(puzzleRequest)
       .then((response) => {
         if (response == null || !response.steps) {
@@ -182,7 +190,10 @@ function ControlPanel({
           run_algorithm(resullt, response, algorithm);
         }
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log(e))
+      .finally(() => {
+        setIsCalculating(false);
+      });
   }
 
   return (
@@ -214,17 +225,21 @@ function ControlPanel({
         </div>
 
         <div className="button-group">
-          <button className="btn-solve" onClick={handle_solve} disabled={isSolving}>
-            {isSolving ? "Solving..." : "Solve"}
+          <button
+            className="btn-solve"
+            onClick={handle_solve}
+            disabled={isSolving || isCalculating}
+          >
+            {isCalculating ? "Calculating..." : isSolving ? "Solving..." : "Solve"}
           </button>
-          <button type="submit" onClick={handle_submit_click} disabled={isSolving}>
+          <button type="submit" onClick={handle_submit_click} disabled={isSolving || isCalculating}>
             change_state
           </button>
-          <button type="reset" onClick={handle_reset_click}>
+          <button type="reset" onClick={handle_reset_click} disabled={isCalculating}>
             Reset
           </button>
 
-          {isSolving && (
+          {isSolving ? (
             <>
               <button
                 type="button"
@@ -241,13 +256,24 @@ function ControlPanel({
                 Stop
               </button>
             </>
+          ) : (
+            totalSteps > 0 && (
+              <button
+                type="button"
+                className="btn-continue"
+                onClick={onContinue}
+                title="Continue visualization"
+              >
+                Continue ▶
+              </button>
+            )
           )}
 
           <select
             className="select-algo"
             onChange={(e) => setAlgorithm(e.target.value as operation_mode)}
             required
-            disabled={isSolving}
+            disabled={isSolving || isCalculating}
             value={algorithm}
           >
             <option label="BFS" value={"BFS"}></option>
@@ -261,7 +287,7 @@ function ControlPanel({
               value={heuristic_value}
               onChange={(e) => setheuristic_value(e.target.value as heuristic)}
               required
-              disabled={isSolving}
+              disabled={isSolving || isCalculating}
             >
               <option value="manhattan">manhattan</option>
               <option value="euclidean">euclidean</option>
@@ -270,8 +296,30 @@ function ControlPanel({
         </div>
 
         {totalSteps > 0 && (
-          <div className="steps-counter">
-            Step: <strong>{currentStep.toLocaleString()}</strong> / <strong>{totalSteps.toLocaleString()}</strong>
+          <div className="steps-row">
+            <div className="steps-counter">
+              Step: <strong>{currentStep.toLocaleString()}</strong> / <strong>{totalSteps.toLocaleString()}</strong>
+            </div>
+            <div className="step-nav-buttons">
+              <button
+                type="button"
+                className="btn-step"
+                onClick={onStepBackward}
+                disabled={currentStep <= 1}
+                title="Step Backward"
+              >
+                ◀ Prev
+              </button>
+              <button
+                type="button"
+                className="btn-step"
+                onClick={onStepForward}
+                disabled={currentStep >= totalSteps}
+                title="Step Forward"
+              >
+                Next ▶
+              </button>
+            </div>
           </div>
         )}
 

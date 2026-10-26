@@ -52,6 +52,30 @@ function Board() {
     setIsSolving(false);
   };
 
+  const handleContinue = () => {
+    if (solutionSteps.length === 0 || isSolving) return;
+    const startIndex = currentStep >= totalSteps ? 0 : currentStep;
+    solve_puzzle(solutionSteps, startIndex);
+  };
+
+  const handleStepForward = () => {
+    if (solutionSteps.length === 0) return;
+    handleStop();
+    const nextIdx = Math.min(solutionSteps.length - 1, currentStep);
+    const state = solutionSteps[nextIdx].flat();
+    setMatrix(state.map((val, idx) => ({ value: val, index: idx })));
+    setCurrentStep(nextIdx + 1);
+  };
+
+  const handleStepBackward = () => {
+    if (solutionSteps.length === 0) return;
+    handleStop();
+    const prevIdx = Math.max(0, currentStep - 2);
+    const state = solutionSteps[prevIdx].flat();
+    setMatrix(state.map((val, idx) => ({ value: val, index: idx })));
+    setCurrentStep(prevIdx + 1);
+  };
+
   function run_algorithm(
     states: Array<Array<Array<number>>>,
     response?: Response | null,
@@ -61,13 +85,16 @@ function Board() {
     if (response?.explored_nodes) {
       setExploredNodes(response.explored_nodes);
     }
-    if (response?.tree_nodes) {
+    // Depth limit >= 20 check: do not visualize search tree if depth / steps >= 20
+    if (response?.tree_nodes && states.length <= 20) {
       setTreeNodes(response.tree_nodes);
+    } else {
+      setTreeNodes(null);
     }
     if (mode) {
       setOperationMode(mode);
     }
-    solve_puzzle(states);
+    solve_puzzle(states, 0);
   }
 
   const handleSelectExploredState = (stateArray: number[][]) => {
@@ -79,7 +106,10 @@ function Board() {
   const delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-  const solve_puzzle = async (Steps: Array<Array<Array<number>>>) => {
+  const solve_puzzle = async (
+    Steps: Array<Array<Array<number>>>,
+    startIndex: number = 0,
+  ) => {
     const runId = ++runIdRef.current;
     isRunningRef.current = true;
     skipToEndRef.current = false;
@@ -90,9 +120,9 @@ function Board() {
     });
 
     setTotalSteps(states.length);
-    setCurrentStep(0);
+    setCurrentStep(startIndex);
 
-    let currentIndex = 0;
+    let currentIndex = startIndex;
 
     while (currentIndex < states.length) {
       if (runIdRef.current !== runId || !isRunningRef.current) {
@@ -168,6 +198,9 @@ function Board() {
           totalSteps={totalSteps}
           onSkipToEnd={handleSkipToEnd}
           onStop={handleStop}
+          onContinue={handleContinue}
+          onStepForward={handleStepForward}
+          onStepBackward={handleStepBackward}
         />
         <div className="boardCard">
           <div className="boardCardHeader">

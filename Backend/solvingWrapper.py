@@ -76,6 +76,6 @@ class solveWrapper:
             time_taken=excution_time,
             explored_nodes=answer.explored_nodes,
             explored_order=answer.explored_order,
-            tree_nodes=answer.tree_nodes,
+            tree_nodes=answer.tree_nodes if len(stepsList) <= 20 else None,
         )
         return response_entity

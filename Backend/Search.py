@@ -203,7 +203,6 @@ def DFS(
                 next_state_key not in hash_map
                 or next_node.depth < hash_map[next_state_key]
             ):
-                hash_map[next_state_key] = next_node.depth
                 stack.append(next_node)
 
     return None
