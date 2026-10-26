@@ -20,6 +20,7 @@ if __name__ == "__main__":
         start_node, 10, start_node.operation_mode, euclidean_distance, goal
     )
     if answer:
+        answer = answer.goal_node 
         ans_cost = answer.cost
 
         steps: list = []

@@ -41,7 +41,7 @@ def search_function(
     elif search_type == "DFS":
         return DFS(start_node, max_depth, goal)
     elif search_type == "IDFS":
-        for depth_limit in range(max_depth):
+        for depth_limit in range(max_depth + 1):
             result = DFS(start_node, depth_limit, goal)
             if result is not None:
                 return result
@@ -160,13 +160,15 @@ def DFS(
     explored_order: list[list[list[int]]] = []
     tree_nodes: list[Tuple[str, int, str, float]] = []
     state_to_idx: dict[str, int] = {}
-    hash_map[json.dumps(start_node.state)] = start_node.compare_Val
 
     while stack:
         current_node: node = stack.pop()
         current_state_key = json.dumps(current_node.state)
 
-        hash_map[current_state_key] = current_node.compare_Val
+        if hash_map.get(current_state_key, float("inf")) <= current_node.depth:   # AFTER
+            continue
+        hash_map[current_state_key] = current_node.depth
+        
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 

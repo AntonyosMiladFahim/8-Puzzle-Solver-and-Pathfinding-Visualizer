@@ -7,6 +7,8 @@ def manhattan_distance(Node: node, map: dict[int, tuple[int, int]]) -> float:
     val: float = 0
     for row in range(len(Node.state)):
         for col in range(len(Node.state[row])):
+            if Node.state[row][col] == 0:
+                continue   
             val += abs(map.get(Node.state[row][col], (0, 0))[0] - row)
             val += abs(map.get(Node.state[row][col], (0, 0))[1] - col)
 
@@ -17,6 +19,8 @@ def euclidean_distance(Node: node, map: dict[int, tuple[int, int]]) -> float:
     val: float = 0
     for row in range(len(Node.state)):
         for col in range(len(Node.state[row])):
+            if Node.state[row][col] == 0:
+                continue   
             dx: float = map.get(Node.state[row][col], (0, 0))[0] - row
             dy: float = map.get(Node.state[row][col], (0, 0))[1] - col
             val += math.sqrt((dx * dx) + (dy * dy))
