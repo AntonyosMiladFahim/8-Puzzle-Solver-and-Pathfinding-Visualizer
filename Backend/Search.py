@@ -75,15 +75,23 @@ def A_star(
             explored_order.append(current_node.state)
 
         curr_str = "".join(str(n) for row in current_node.state for n in row)
-        parent_str = "".join(str(n) for row in current_node.parent.state for n in row) if current_node.parent else None
+        parent_str = (
+            "".join(str(n) for row in current_node.parent.state for n in row)
+            if current_node.parent
+            else None
+        )
         p_idx = state_to_idx.get(parent_str, -1) if parent_str else -1
         state_to_idx[curr_str] = len(tree_nodes)
-        tree_nodes.append((curr_str, p_idx, current_node.operation_made, current_node.compare_Val))
+        tree_nodes.append(
+            (curr_str, p_idx, current_node.operation_made, current_node.compare_Val)
+        )
 
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node, explored_order, tree_nodes)
 
-        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(current_node)
+        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
+            current_node
+        )
         next_nodes: list[node] = []
         for state in next_states:
             next_node = current_node.move(move=state)
@@ -114,15 +122,23 @@ def BFS(start_node: node, goal: dict[int, tuple[int, int]]) -> search_data | Non
             explored_order.append(current_node.state)
 
         curr_str = "".join(str(n) for row in current_node.state for n in row)
-        parent_str = "".join(str(n) for row in current_node.parent.state for n in row) if current_node.parent else None
+        parent_str = (
+            "".join(str(n) for row in current_node.parent.state for n in row)
+            if current_node.parent
+            else None
+        )
         p_idx = state_to_idx.get(parent_str, -1) if parent_str else -1
         state_to_idx[curr_str] = len(tree_nodes)
-        tree_nodes.append((curr_str, p_idx, current_node.operation_made, current_node.compare_Val))
+        tree_nodes.append(
+            (curr_str, p_idx, current_node.operation_made, current_node.compare_Val)
+        )
 
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node, explored_order, tree_nodes)
 
-        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(current_node)
+        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
+            current_node
+        )
         next_nodes: list[node] = []
         for state in next_states:
             next_node = current_node.move(move=state)
@@ -155,10 +171,16 @@ def DFS(
             explored_order.append(current_node.state)
 
         curr_str = "".join(str(n) for row in current_node.state for n in row)
-        parent_str = "".join(str(n) for row in current_node.parent.state for n in row) if current_node.parent else None
+        parent_str = (
+            "".join(str(n) for row in current_node.parent.state for n in row)
+            if current_node.parent
+            else None
+        )
         p_idx = state_to_idx.get(parent_str, -1) if parent_str else -1
         state_to_idx[curr_str] = len(tree_nodes)
-        tree_nodes.append((curr_str, p_idx, current_node.operation_made, current_node.compare_Val))
+        tree_nodes.append(
+            (curr_str, p_idx, current_node.operation_made, current_node.compare_Val)
+        )
 
         if unmatching_tiles(current_node, goal) == 0:
             return search_data(hash_map, current_node, explored_order, tree_nodes)
@@ -166,7 +188,9 @@ def DFS(
         if current_node.depth >= max_depth:
             continue
 
-        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(current_node)
+        next_states: list[Literal["UP", "DOWN", "LEFT", "RIGHT"]] = get_next_states(
+            current_node
+        )
         next_states.reverse()
         next_nodes: list[node] = []
         for state in next_states:
@@ -175,8 +199,11 @@ def DFS(
 
         for next_node in next_nodes:
             next_state_key = json.dumps(next_node.state)
-            if not (next_state_key in hash_map):
-                hash_map[next_state_key] = next_node.compare_Val
+            if (
+                next_state_key not in hash_map
+                or next_node.depth < hash_map[next_state_key]
+            ):
+                hash_map[next_state_key] = next_node.depth
                 stack.append(next_node)
 
     return None
