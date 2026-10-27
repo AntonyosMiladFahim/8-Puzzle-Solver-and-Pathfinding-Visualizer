@@ -1,16 +1,17 @@
 import { Select } from "./Select";
 import { usePathfinding } from "../hooks/usePathfinding";
-import { MAZES } from "../utils/constants";
-import type { MazeType } from "../utils/types";
+import { MAZES, PATHFINDING_ALGORITHMS } from "../utils/constants";
+import type { AlgorithmType, MazeType } from "../utils/types";
 import { resetGrid } from "../utils/resetGrid";
 import { useTile } from "../hooks/UseTile";
 import { useState } from "react";
 import { runMazeAlgorithm } from "../utils/runMazeAlgorithm";
 import { useSpeed } from "../hooks/useSpeed";
+import { PlayButton } from "./PlayButton";
 
 export function Nav() {
   const [isDisabled, setIsDisabled] = useState(false);
-  const { maze, setMaze, grid, setGrid, setIsGraphVisualized } =
+  const { maze, setMaze, grid, setGrid, isGraphVisualized, setIsGraphVisualized , algorithm, setAlgorithm } =
     usePathfinding();
   const { startTile, endTile } = useTile();
   const { speed } = useSpeed();
@@ -27,6 +28,16 @@ export function Nav() {
     const newGrid = grid.slice();
     setGrid(newGrid);
     setIsGraphVisualized(false);
+  };
+
+  const handleRunVisualizer = () => {
+    if (isGraphVisualized) {
+      setIsGraphVisualized(false);
+      resetGrid({ grid : grid.slice(), startTile, endTile });
+      return
+    }
+    // run the algorithm
+    
   };
   return (
     <div
@@ -48,6 +59,10 @@ export function Nav() {
               handleGenerateMaze(_e.target.value as MazeType);
             }}
           />
+          <Select label =  'Graph'  value = {algorithm} options = {PATHFINDING_ALGORITHMS} onChange = {(_e) => {
+            setAlgorithm(_e.target.value as AlgorithmType);
+          }} />
+          <PlayButton isDisabled={isDisabled} isGraphVisualized={isGraphVisualized} handleRunVisualizer={() => {}} />
         </div>
       </div>
     </div>

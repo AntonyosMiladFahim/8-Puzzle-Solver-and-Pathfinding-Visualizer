@@ -1,4 +1,8 @@
 export type AlgorithmType = "UCS" | "A_STAR" | "BFS" | "DFS";
+export interface AlgorithmSelectType {
+  name: string;
+  value: AlgorithmType;
+}
 export type MazeType = "NONE" | "BINARY_TREE" | "RECURSIVE_DIVISION";
 export type MazeSelectType = { name: string; value: MazeType };
 export type TileType = {

@@ -1,4 +1,4 @@
-import type { MazeSelectType, SpeedSelectType, TileType } from "./types";
+import type { AlgorithmSelectType, MazeSelectType, SpeedSelectType, TileType } from "./types";
 
 export const MAX_ROWS = 39;
 export const MAX_COLS = 49;
@@ -44,6 +44,13 @@ export const MAZES: MazeSelectType[] = [
     name: "Recursive division",
     value: "RECURSIVE_DIVISION",
   },
+];
+
+export const PATHFINDING_ALGORITHMS: AlgorithmSelectType[] = [
+  { name: "Dijkstra", value: "UCS" },
+  { name: "A*", value: "A_STAR" },
+  { name: "BFS", value: "BFS" },
+  { name: "DFS", value: "DFS" },
 ];
 
 export const SPEEDS: SpeedSelectType[] = [
