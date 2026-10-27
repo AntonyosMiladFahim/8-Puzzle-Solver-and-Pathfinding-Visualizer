@@ -1,15 +1,23 @@
 import { Select } from "./Select";
 import { usePathfinding } from "../hooks/usePathfinding";
-import { MAZES, PATHFINDING_ALGORITHMS } from "../utils/constants";
+import { EXTENDED_SLEEP_TIME, MAZES, PATHFINDING_ALGORITHMS, SLEEP_TIME, SPEEDS } from "../utils/constants";
 import type { AlgorithmType, MazeType } from "../utils/types";
 import { resetGrid } from "../utils/resetGrid";
 import { useTile } from "../hooks/UseTile";
-import { useState } from "react";
+import { useState, type RefObject } from "react";
 import { runMazeAlgorithm } from "../utils/runMazeAlgorithm";
 import { useSpeed } from "../hooks/useSpeed";
 import { PlayButton } from "./PlayButton";
+import { runPathFindingAlgorithm } from "../utils/runPathFindingAlgorithm";
+import { animatePath } from "../utils/animatePath";
 
-export function Nav() {
+export function Nav(
+  {
+    isVisualizedRunningRef,
+  }: {
+    isVisualizedRunningRef: RefObject<boolean>;
+  }
+) {
   const [isDisabled, setIsDisabled] = useState(false);
   const { maze, setMaze, grid, setGrid, isGraphVisualized, setIsGraphVisualized , algorithm, setAlgorithm } =
     usePathfinding();
@@ -30,14 +38,24 @@ export function Nav() {
     setIsGraphVisualized(false);
   };
 
-  const handleRunVisualizer = () => {
+  const handleRunVisualizer = async () => {
     if (isGraphVisualized) {
       setIsGraphVisualized(false);
       resetGrid({ grid : grid.slice(), startTile, endTile });
       return
     }
-    // run the algorithm
-    
+    const { traversedTiles, path } = (await runPathFindingAlgorithm(algorithm, grid, startTile, endTile)) || { traversedTiles: [], path: [] };
+    animatePath(traversedTiles, path, startTile, endTile, speed);
+    setIsDisabled(true);
+    isVisualizedRunningRef.current = true;
+    setTimeout(() => {
+      const newGrid = grid.slice();
+      setGrid(newGrid);
+      setIsGraphVisualized(true);
+      setIsDisabled(false);
+      isVisualizedRunningRef.current = false;
+    }, SLEEP_TIME * (traversedTiles.length + SLEEP_TIME * 2) + EXTENDED_SLEEP_TIME * (path.length + 60) * SPEEDS.find((s) => s.value === speed)!.value);
+
   };
   return (
     <div
@@ -62,7 +80,7 @@ export function Nav() {
           <Select label =  'Graph'  value = {algorithm} options = {PATHFINDING_ALGORITHMS} onChange = {(_e) => {
             setAlgorithm(_e.target.value as AlgorithmType);
           }} />
-          <PlayButton isDisabled={isDisabled} isGraphVisualized={isGraphVisualized} handleRunVisualizer={() => {}} />
+          <PlayButton isDisabled={isDisabled} isGraphVisualized={isGraphVisualized} handleRunVisualizer={handleRunVisualizer} />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import { MAX_COLS, MAX_ROWS, WALL_TILE_STYLE } from "./constants";
-import { isEqual, sleep, SLEEP_TIME } from "./helpers";
+import { MAX_COLS, MAX_ROWS, SLEEP_TIME, WALL_TILE_STYLE } from "./constants";
+import { isEqual, sleep } from "./helpers";
 import {type TileType, type GridType } from "./types";
 
 export async function constructBorder(

@@ -1,3 +1,4 @@
+import { bfs } from "../lib/algorithms/pathfinding/bfs";
 import type { AlgorithmType, GridType, TileType } from "./types";
 
 export const runPathFindingAlgorithm = async (
@@ -7,8 +8,8 @@ export const runPathFindingAlgorithm = async (
   endTile: TileType,
 ) => {
   switch (algoithm) {
-    case "UCS":
-      return;
+    case "BFS":
+      return bfs(grid, startTile, endTile);
       default:
       return;
   } 
