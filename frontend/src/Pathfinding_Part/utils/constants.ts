@@ -36,6 +36,7 @@ export const END_TILE_STYLE = TILE_STYLE + " bg-red-400";
 export const WALL_TILE_STYLE = TILE_STYLE + " bg-gray-400";
 export const PATH_TILE_STYLE = TILE_STYLE + " bg-yellow-500";
 
+
 export const MAZES: MazeSelectType[] = [
   { name: "no Maze", value: "NONE" },
   { name: "Binary Tree", value: "BINARY_TREE" },
@@ -45,7 +46,7 @@ export const MAZES: MazeSelectType[] = [
   },
 ];
 
-export const SPEED: SpeedSelectType[] = [
+export const SPEEDS: SpeedSelectType[] = [
   { name: "Slow", value: 2 },
   { name: "Medium", value: 1 },
   { name: "Fast", value: 0.5 },

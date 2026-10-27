@@ -60,3 +60,5 @@ export const getRandInt = (min: number, max: number) => {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
 };
+
+export const SLEEP_TIME = 8;

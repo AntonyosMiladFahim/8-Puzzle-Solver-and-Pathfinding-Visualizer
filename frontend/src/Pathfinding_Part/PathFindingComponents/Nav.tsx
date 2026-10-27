@@ -43,6 +43,7 @@ export function Nav() {
             label="Maze"
             value={maze}
             options={MAZES}
+            isDisabled={isDisabled}
             onChange={(_e) => {
               handleGenerateMaze(_e.target.value as MazeType);
             }}

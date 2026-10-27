@@ -1,13 +1,13 @@
-import { MAX_COLS, MAX_ROWS, SPEED, WALL_TILE_STYLE } from "./constants";
+import { MAX_COLS, MAX_ROWS, SPEEDS, WALL_TILE_STYLE } from "./constants";
 import { isRowColEqual } from "./helpers";
-import type { SpeedType, TileType } from "./types";
+import type { SpeedSelectType, SpeedType, TileType } from "./types";
 
 export const createWall = (
   startTile: TileType,
   endTile: TileType,
   speed: SpeedType,
 ) => {
-  const delay = 6 * SPEED.find((s) => s.value == speed)!.value - 1;
+  const delay = 6 * SPEEDS.find((s: SpeedSelectType) => s.value == speed)!.value - 1;
 
   for (let row = 0; row < MAX_ROWS; row++) {
     setTimeout(
