@@ -35,6 +35,8 @@ export const runMazeAlgorithm = async ({
       setIsDisabled,
       speed
     );
-    setTimeout(() => {}, 800 * currentSpeed);
+    setTimeout(() => {
+      setIsDisabled(false);
+    }, 800 * currentSpeed);
   }
 };
