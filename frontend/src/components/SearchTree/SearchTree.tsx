@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState, useMemo, useCallback } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 import "./SearchTree.css";
 
 interface SearchTreeProps {
@@ -33,9 +39,15 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
   const [zoom, setZoom] = useState<number>(0.75);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 50 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const [hoveredNode, setHoveredNode] = useState<LayoutNode | null>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const [autoFocus, setAutoFocus] = useState<boolean>(true);
   const prevStepRef = useRef<number>(-1);
 
@@ -48,7 +60,8 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
 
     for (let i = 0; i < treeNodes.length; i++) {
       const [stateStr, parentIdx, move, val] = treeNodes[i];
-      const parentNode = parentIdx >= 0 && parentIdx < nodes.length ? nodes[parentIdx] : null;
+      const parentNode =
+        parentIdx >= 0 && parentIdx < nodes.length ? nodes[parentIdx] : null;
       const depth = parentNode ? parentNode.depth + 1 : 0;
 
       if (!childrenMap.has(parentIdx)) {
@@ -63,7 +76,14 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
         id: i,
         stateStr,
         parentIdx,
-        move: ({ UP: "DOWN", DOWN: "UP", LEFT: "RIGHT", RIGHT: "LEFT" } as Record<string, string>)[move] ?? (move || "S"),
+        move:
+          (
+            { UP: "DOWN", DOWN: "UP", LEFT: "RIGHT", RIGHT: "LEFT" } as Record<
+              string,
+              string
+            >
+          )[move] ??
+          (move || "S"),
         val,
         depth,
         x: 0,
@@ -91,7 +111,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
     let goalId: number | null = null;
 
     if (layoutNodes.length === 0) {
-      return { solutionPathNodes: pathNodes, solutionNodeIds: ids, goalNodeId: goalId };
+      return {
+        solutionPathNodes: pathNodes,
+        solutionNodeIds: ids,
+        goalNodeId: goalId,
+      };
     }
 
     const root = layoutNodes[0];
@@ -99,7 +123,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
     ids.add(root.id);
 
     if (!solutionSteps || solutionSteps.length === 0) {
-      return { solutionPathNodes: pathNodes, solutionNodeIds: ids, goalNodeId: goalId };
+      return {
+        solutionPathNodes: pathNodes,
+        solutionNodeIds: ids,
+        goalNodeId: goalId,
+      };
     }
 
     // Index all layout nodes by stateStr for O(1) instant lookup
@@ -121,7 +149,8 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
       let match: LayoutNode | null = null;
 
       if (candidates && candidates.length > 0) {
-        match = candidates.find((c) => c.parentIdx === prevNode.id) || candidates[0];
+        match =
+          candidates.find((c) => c.parentIdx === prevNode.id) || candidates[0];
       }
 
       if (match) {
@@ -134,7 +163,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
       }
     }
 
-    return { solutionPathNodes: pathNodes, solutionNodeIds: ids, goalNodeId: goalId };
+    return {
+      solutionPathNodes: pathNodes,
+      solutionNodeIds: ids,
+      goalNodeId: goalId,
+    };
   }, [solutionSteps, layoutNodes]);
 
   const isDfsMode = operationMode === "DFS" || operationMode === "IDFS";
@@ -142,7 +175,10 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
   // Determine active node for currentStepIndex with 100% precision
   const activeNode = useMemo<LayoutNode | null>(() => {
     if (solutionPathNodes.length > 0) {
-      const idx = Math.max(0, Math.min(solutionPathNodes.length - 1, currentStepIndex));
+      const idx = Math.max(
+        0,
+        Math.min(solutionPathNodes.length - 1, currentStepIndex),
+      );
       return solutionPathNodes[idx];
     }
     return layoutNodes[currentStepIndex] || layoutNodes[0] || null;
@@ -192,9 +228,15 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
       const node = layoutNodes[i];
       if (node.parentIdx >= 0 && node.parentIdx < layoutNodes.length) {
         const parent = layoutNodes[node.parentIdx];
-        const isWinningEdge = solutionNodeIds.has(node.id) && solutionNodeIds.has(parent.id);
-        const isActiveBranchEdge = activeBranchIds.has(node.id) && activeBranchIds.has(parent.id);
-        const isBacktrackedEdge = isDfsMode && activeNode && node.id < activeNode.id && !isActiveBranchEdge;
+        const isWinningEdge =
+          solutionNodeIds.has(node.id) && solutionNodeIds.has(parent.id);
+        const isActiveBranchEdge =
+          activeBranchIds.has(node.id) && activeBranchIds.has(parent.id);
+        const isBacktrackedEdge =
+          isDfsMode &&
+          activeNode &&
+          node.id < activeNode.id &&
+          !isActiveBranchEdge;
 
         if (isFarZoom && !isWinningEdge && !isActiveBranchEdge) {
           continue;
@@ -221,13 +263,16 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
               ctx.shadowBlur = 0;
               ctx.setLineDash([3, 3]);
             } else {
-              ctx.strokeStyle = isMediumZoom ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.06)";
+              ctx.strokeStyle = isMediumZoom
+                ? "rgba(255, 255, 255, 0.02)"
+                : "rgba(255, 255, 255, 0.06)";
               ctx.lineWidth = 1;
               ctx.shadowBlur = 0;
               ctx.setLineDash([]);
             }
           } else {
-            const isEdgeActive = isWinningEdge && node.depth <= currentStepIndex;
+            const isEdgeActive =
+              isWinningEdge && node.depth <= currentStepIndex;
             if (isEdgeActive) {
               ctx.strokeStyle = "#E50914";
               ctx.lineWidth = isFarZoom ? 5 : 3.5;
@@ -238,7 +283,9 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
               ctx.lineWidth = isFarZoom ? 3 : 2;
               ctx.shadowBlur = 0;
             } else {
-              ctx.strokeStyle = isMediumZoom ? "rgba(255, 255, 255, 0.03)" : "rgba(255, 255, 255, 0.08)";
+              ctx.strokeStyle = isMediumZoom
+                ? "rgba(255, 255, 255, 0.03)"
+                : "rgba(255, 255, 255, 0.08)";
               ctx.lineWidth = 1;
               ctx.shadowBlur = 0;
             }
@@ -253,7 +300,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
             ctx.fillStyle = "#8C8C8C";
             ctx.font = "9px -apple-system, sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText(String(node.val.toPrecision(3)), (parent.x + node.x) / 2 + 8, (parent.y + node.y) / 2);
+            ctx.fillText(
+              String(node.val.toPrecision(3)),
+              (parent.x + node.x) / 2 + 8,
+              (parent.y + node.y) / 2,
+            );
           }
         }
       }
@@ -273,18 +324,35 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
         const isGoal = goalNodeId === node.id;
         const isHovered = hoveredNode?.id === node.id;
         const isActiveBranch = isDfsMode && activeBranchIds.has(node.id);
-        const isBacktrackedNode = isDfsMode && activeNode && node.id < activeNode.id && !isActiveBranch;
+        const isBacktrackedNode =
+          isDfsMode && activeNode && node.id < activeNode.id && !isActiveBranch;
         const isCurrentLevel = !isDfsMode && node.depth === currentStepIndex;
         const isPastExplored = !isDfsMode && node.depth < currentStepIndex;
 
-        if (isFarZoom && !isSolutionPath && !isCurrent && !isGoal && !isActiveBranch) {
-          ctx.fillStyle = isCurrentLevel ? "#444444" : isPastExplored || isBacktrackedNode ? "#222222" : "#141414";
+        if (
+          isFarZoom &&
+          !isSolutionPath &&
+          !isCurrent &&
+          !isGoal &&
+          !isActiveBranch
+        ) {
+          ctx.fillStyle = isCurrentLevel
+            ? "#444444"
+            : isPastExplored || isBacktrackedNode
+              ? "#222222"
+              : "#141414";
           ctx.fillRect(node.x - 1.5, node.y - 1.5, 3, 3);
           continue;
         }
 
         ctx.beginPath();
-        const r = isGoal ? radius + 5 : isCurrent ? radius + 5 : isSolutionPath || isActiveBranch ? radius + 2 : radius;
+        const r = isGoal
+          ? radius + 5
+          : isCurrent
+            ? radius + 5
+            : isSolutionPath || isActiveBranch
+              ? radius + 2
+              : radius;
         ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
 
         if (isGoal && currentStepIndex >= node.depth) {
@@ -309,7 +377,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
           ctx.strokeStyle = "rgba(180, 70, 70, 0.35)";
           ctx.lineWidth = 1;
           ctx.shadowBlur = 0;
-        } else if (!isDfsMode && isSolutionPath && node.depth <= currentStepIndex) {
+        } else if (
+          !isDfsMode &&
+          isSolutionPath &&
+          node.depth <= currentStepIndex
+        ) {
           ctx.fillStyle = "#381414";
           ctx.strokeStyle = "#E50914";
           ctx.lineWidth = 2.5;
@@ -362,7 +434,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
             ctx.fillStyle = "#ff4d4f";
             ctx.font = "bold 9px -apple-system, sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText(isDfsMode ? `▼ PROBING (D:${node.depth})` : "▼ EXPLORING", node.x, node.y - r - 8);
+            ctx.fillText(
+              isDfsMode ? `▼ PROBING (D:${node.depth})` : "▼ EXPLORING",
+              node.x,
+              node.y - r - 8,
+            );
           }
         }
 
@@ -371,12 +447,12 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
             (isGoal && currentStepIndex >= node.depth) || isCurrent
               ? "#ffffff"
               : isSolutionPath || isActiveBranch
-              ? "#ffcccc"
-              : isCurrentLevel
-              ? "#dddddd"
-              : isBacktrackedNode
-              ? "#775555"
-              : "#777777";
+                ? "#ffcccc"
+                : isCurrentLevel
+                  ? "#dddddd"
+                  : isBacktrackedNode
+                    ? "#775555"
+                    : "#777777";
           ctx.font = `bold ${isGoal ? 10 : isCurrent ? 11 : 10}px -apple-system, sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -500,7 +576,10 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
     const factor = e.deltaY < 0 ? 1.2 : 0.83;
     const newZoom = Math.max(0.002, Math.min(5.0, zoom * factor));
 
-    const newPanX = mx - canvas.width / 2 - (mx - canvas.width / 2 - pan.x) * (newZoom / zoom);
+    const newPanX =
+      mx -
+      canvas.width / 2 -
+      (mx - canvas.width / 2 - pan.x) * (newZoom / zoom);
     const newPanY = my - (my - pan.y) * (newZoom / zoom);
 
     setZoom(newZoom);
@@ -537,7 +616,10 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
     const treeH = Math.max(100, maxY - minY + 120);
     const fitZoom = Math.max(
       0.002,
-      Math.min(1.0, Math.min((canvas.width - 40) / treeW, (canvas.height - 60) / treeH)),
+      Math.min(
+        1.0,
+        Math.min((canvas.width - 40) / treeW, (canvas.height - 60) / treeH),
+      ),
     );
     setZoom(fitZoom);
     setPan({
@@ -587,8 +669,7 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
             <span className="treeLevelBadge">
               {isDfsMode
                 ? `Depth ${activeNode.depth} · Active Stack: ${activeBranchIds.size} ${goalNodeId === activeNode.id ? "★ Goal Reached!" : "(Probing & Backtracking)"}`
-                : `Level ${activeNode.depth}${solutionSteps.length > 0 ? ` / ${solutionSteps.length}` : ""} ${goalNodeId === activeNode.id ? "★ Goal Reached!" : "(Exploring Level)"}`
-              }
+                : `Level ${activeNode.depth}${solutionSteps.length > 0 ? ` / ${solutionSteps.length}` : ""} ${goalNodeId === activeNode.id ? "★ Goal Reached!" : "(Exploring Level)"}`}
             </span>
           )}
         </div>
@@ -601,16 +682,44 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
           >
             {autoFocus ? "● Follow ON" : "○ Free Pan"}
           </button>
-          <button type="button" className="treeBtn" onClick={fitTree} title="Fit full tree in view">
+          <button
+            type="button"
+            className="treeBtn"
+            onClick={focusActive}
+            title="Focus current active node"
+          >
+            Focus
+          </button>
+          <button
+            type="button"
+            className="treeBtn"
+            onClick={fitTree}
+            title="Fit full tree in view"
+          >
             Fit All
           </button>
-          <button type="button" className="treeBtn iconBtn" onClick={zoomIn} title="Zoom In">
+          <button
+            type="button"
+            className="treeBtn iconBtn"
+            onClick={zoomIn}
+            title="Zoom In"
+          >
             +
           </button>
-          <button type="button" className="treeBtn iconBtn" onClick={zoomOut} title="Zoom Out">
+          <button
+            type="button"
+            className="treeBtn iconBtn"
+            onClick={zoomOut}
+            title="Zoom Out"
+          >
             -
           </button>
-          <button type="button" className="treeBtn" onClick={resetView} title="Reset camera">
+          <button
+            type="button"
+            className="treeBtn"
+            onClick={resetView}
+            title="Reset camera"
+          >
             Reset
           </button>
         </div>
@@ -637,7 +746,11 @@ export const SearchTree: React.FC<SearchTreeProps> = ({
         >
           <div className="tooltipHeader">
             <span>Level (Depth): {hoveredNode.depth}</span>
-            <span>{solutionNodeIds.has(hoveredNode.id) ? "★ Correct Path" : `Move: ${hoveredNode.move}`}</span>
+            <span>
+              {solutionNodeIds.has(hoveredNode.id)
+                ? "★ Correct Path"
+                : `Move: ${hoveredNode.move}`}
+            </span>
           </div>
           <div className="tooltipGrid">
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {

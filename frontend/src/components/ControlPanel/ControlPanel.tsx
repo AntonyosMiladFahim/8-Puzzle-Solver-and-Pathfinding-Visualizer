@@ -28,6 +28,9 @@ type ControlPanelprops = {
   onContinue?: () => void;
   onStepForward?: () => void;
   onStepBackward?: () => void;
+  moves?: Array<{ move: string; stepNumber: number }>;
+  onJumpToStep?: (stepNumber: number) => void;
+  onResetMoves?: () => void;
 };
 
 interface SolutionStats {
@@ -55,7 +58,10 @@ function computeInversionInfo(digits: string): {
   }
 
   // Count inversions excluding 0 (blank tile)
-  const nums = digits.split("").map(Number).filter((n) => n !== 0);
+  const nums = digits
+    .split("")
+    .map(Number)
+    .filter((n) => n !== 0);
   let inversions = 0;
   for (let i = 0; i < nums.length; i++) {
     for (let j = i + 1; j < nums.length; j++) {
@@ -86,16 +92,24 @@ function ControlPanel({
   onContinue,
   onStepForward,
   onStepBackward,
+  moves = [],
+  onJumpToStep,
+  onResetMoves,
 }: ControlPanelprops) {
   const [newState, setnewState] = useState<string>("012345678");
   const [heuristic_value, setheuristic_value] =
     useState<heuristic>("manhattan");
   const [algorithm, setAlgorithm] = useState<operation_mode>("BFS");
-  const [solutionStats, setSolutionStats] = useState<SolutionStats | null>(null);
+  const [solutionStats, setSolutionStats] = useState<SolutionStats | null>(
+    null,
+  );
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // Real-time inversion calculation
-  const inversionInfo = useMemo(() => computeInversionInfo(newState), [newState]);
+  const inversionInfo = useMemo(
+    () => computeInversionInfo(newState),
+    [newState],
+  );
 
   function handle_submit_click(event: React.MouseEvent<HTMLButtonElement>) {
     console.log(event.currentTarget);
@@ -109,6 +123,7 @@ function ControlPanel({
     }
 
     if (character_set.size === 9) {
+      onResetMoves?.();
       const updated: Array<tileInfo> = [...newState].map((c, index) => {
         const t: tileInfo = { value: Number.parseInt(c, 10), index: index };
         return t;
@@ -119,6 +134,7 @@ function ControlPanel({
   }
 
   function handle_reset_click() {
+    onResetMoves?.();
     let initial_state = "";
     const character_set: Set<string> = new Set();
     for (let i = 0; i < 9; i++) {
@@ -174,7 +190,9 @@ function ControlPanel({
     solve_state(puzzleRequest)
       .then((response) => {
         if (response == null || !response.steps) {
-          alert("Could not solve: Either this state is unsolvable or backend returned an error.");
+          alert(
+            "Could not solve: Either this state is unsolvable or backend returned an error.",
+          );
           return;
         } else {
           const exploredCount = response.explored_nodes
@@ -230,29 +248,33 @@ function ControlPanel({
             onClick={handle_solve}
             disabled={isSolving || isCalculating}
           >
-            {isCalculating ? "Calculating..." : isSolving ? "Solving..." : "Solve"}
+            {isCalculating
+              ? "Calculating..."
+              : isSolving
+                ? "Solving..."
+                : "Solve"}
           </button>
-          <button type="submit" onClick={handle_submit_click} disabled={isSolving || isCalculating}>
+          <button
+            type="submit"
+            onClick={handle_submit_click}
+            disabled={isSolving || isCalculating}
+          >
             change_state
           </button>
-          <button type="reset" onClick={handle_reset_click} disabled={isCalculating}>
+          <button
+            type="reset"
+            onClick={handle_reset_click}
+            disabled={isCalculating}
+          >
             Reset
           </button>
 
           {isSolving ? (
             <>
-              <button
-                type="button"
-                className="btn-skip"
-                onClick={onSkipToEnd}
-              >
+              <button type="button" className="btn-skip" onClick={onSkipToEnd}>
                 Skip to End
               </button>
-              <button
-                type="button"
-                className="btn-stop"
-                onClick={onStop}
-              >
+              <button type="button" className="btn-stop" onClick={onStop}>
                 Stop
               </button>
             </>
@@ -298,7 +320,8 @@ function ControlPanel({
         {totalSteps > 0 && (
           <div className="steps-row">
             <div className="steps-counter">
-              Step: <strong>{currentStep.toLocaleString()}</strong> / <strong>{totalSteps.toLocaleString()}</strong>
+              Step: <strong>{currentStep.toLocaleString()}</strong> /{" "}
+              <strong>{totalSteps.toLocaleString()}</strong>
             </div>
             <div className="step-nav-buttons">
               <button
@@ -329,10 +352,18 @@ function ControlPanel({
               Cost: <strong>{solutionStats.cost ?? totalSteps}</strong>
             </span>
             <span className="stat-badge">
-              Explored Nodes: <strong>{solutionStats.exploredCount?.toLocaleString()}</strong>
+              Explored Nodes:{" "}
+              <strong>{solutionStats.exploredCount?.toLocaleString()}</strong>
             </span>
             <span className="stat-badge">
-              Time: <strong>{solutionStats.time_taken != null ? (solutionStats.time_taken < 1 ? `${(solutionStats.time_taken * 1000).toFixed(1)} ms` : `${solutionStats.time_taken.toFixed(3)} s`) : "—"}</strong>
+              Time:{" "}
+              <strong>
+                {solutionStats.time_taken != null
+                  ? solutionStats.time_taken < 1
+                    ? `${(solutionStats.time_taken * 1000).toFixed(1)} ms`
+                    : `${solutionStats.time_taken.toFixed(3)} s`
+                  : "—"}
+              </strong>
             </span>
           </div>
         )}
@@ -357,7 +388,11 @@ function ControlPanel({
               min="1"
               max="1000"
               value={speed}
-              onChange={(e) => setSpeed(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
+              onChange={(e) =>
+                setSpeed(
+                  Math.max(1, Math.min(1000, Number(e.target.value) || 1)),
+                )
+              }
               className="speed-input"
             />
             <span>x</span>
@@ -376,6 +411,54 @@ function ControlPanel({
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="moves-section">
+          <div className="moves-header">
+            <span className="moves-title">
+              Sequence of Moves {moves.length > 0 ? `(${moves.length})` : ""}
+            </span>
+            {moves.length > 0 && currentStep > 0 && (
+              <span className="current-move-badge">
+                Step {currentStep} / {moves.length}
+                {moves[currentStep - 1]
+                  ? ` • ${moves[currentStep - 1].move}`
+                  : ""}
+              </span>
+            )}
+          </div>
+
+          {moves.length > 0 ? (
+            <div className="moves-scroll-container">
+              {moves.map((item, idx) => {
+                const isActive = currentStep === item.stepNumber;
+                const isPassed = currentStep > item.stepNumber;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`move-pill ${isActive ? "active" : ""} ${isPassed ? "passed" : ""}`}
+                    onClick={() => onJumpToStep?.(item.stepNumber)}
+                    title={`Jump to Move #${item.stepNumber}: ${item.move}`}
+                  >
+                    <span className="move-num">#{item.stepNumber}</span>
+                    <span className="move-arrow">
+                      {item.move === "UP" && "↑"}
+                      {item.move === "DOWN" && "↓"}
+                      {item.move === "LEFT" && "←"}
+                      {item.move === "RIGHT" && "→"}
+                    </span>
+                    <span className="move-dir">{item.move}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="moves-empty">
+              No moves recorded yet. Select an algorithm and click Solve to
+              generate the move sequence.
+            </div>
+          )}
         </div>
       </div>
     </div>

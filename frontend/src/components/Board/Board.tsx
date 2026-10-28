@@ -32,6 +32,7 @@ function Board() {
   const [treeNodes, setTreeNodes] = useState<Array<[string, number, string, number]> | null>(null);
   const [operationMode, setOperationMode] = useState<operation_mode>("BFS");
   const [activeRightTab, setActiveRightTab] = useState<"tree" | "nodes">("tree");
+  const [moves, setMoves] = useState<Array<{ move: string; stepNumber: number }>>([]);
 
   const speedRef = useRef<number>(1);
   const isRunningRef = useRef<boolean>(false);
@@ -83,6 +84,16 @@ function Board() {
     }
   };
 
+  const handleJumpToStep = (stepNumber: number) => {
+    handleStop();
+    if (solutionSteps.length > 0) {
+      const idx = Math.min(solutionSteps.length - 1, Math.max(0, stepNumber));
+      const state = solutionSteps[idx].flat();
+      setMatrix(state.map((val, i) => ({ value: val, index: i })));
+      setCurrentStep(idx);
+    }
+  };
+
   function run_algorithm(
     states: Array<Array<Array<number>>>,
     response?: Response | null,
@@ -101,6 +112,14 @@ function Board() {
     }
     if (mode) {
       setOperationMode(mode);
+    }
+    // Extract move sequence from response.steps
+    if (response?.steps && response.steps.length > 1) {
+      const recordedMoves = response.steps.slice(1).map((s, idx) => ({
+        move: s.move,
+        stepNumber: idx + 1,
+      }));
+      setMoves(recordedMoves);
     }
     solve_puzzle(states, 0);
   }
@@ -209,6 +228,9 @@ function Board() {
           onContinue={handleContinue}
           onStepForward={handleStepForward}
           onStepBackward={handleStepBackward}
+          moves={moves}
+          onJumpToStep={handleJumpToStep}
+          onResetMoves={() => setMoves([])}
         />
         <div className="boardCard">
           <div className="boardCardHeader">

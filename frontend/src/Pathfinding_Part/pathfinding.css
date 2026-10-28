@@ -216,14 +216,14 @@ div[class*="border-sky-300"] {
    5. Grid Tiles (Refined Theme Colors & Borders)
    -------------------------------------------------------------------------- */
 /* Base Tile: replace harsh sky-blue with subtle dark obsidian borders */
-[id*="-"] {
+div[class*="border-sky-300"] [id*="-"] {
   border-color: rgba(255, 255, 255, 0.05) !important;
   background-color: #0b0b0d;
   transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 /* Interactive Hover on empty tiles when drawing walls */
-[id*="-"]:not(.bg-gray-400):not(.animate-wall):not(.bg-green-400):not(.bg-red-400):not(.bg-cyan-400):not(.animate-traversed):not(.bg-yellow-500):not(.animate-path):hover {
+div[class*="border-sky-300"] [id*="-"]:not(.bg-gray-400):not(.animate-wall):not(.bg-green-400):not(.bg-red-400):not(.bg-cyan-400):not(.animate-traversed):not(.bg-yellow-500):not(.animate-path):hover {
   background-color: rgba(229, 9, 20, 0.14) !important;
   cursor: pointer;
 }

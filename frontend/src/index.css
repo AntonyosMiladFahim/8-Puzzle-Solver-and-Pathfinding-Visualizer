@@ -1,4 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@import "./Pathfinding_Part/pathfinding.css";
 
 :root {
   /* Template Palette */
@@ -21,30 +24,16 @@
 
 * {
   box-sizing: border-box;
-@import "tailwindcss";
-@config "../tailwind.config.js";
-@import "./Pathfinding_Part/pathfinding.css";
-
-:root {
-  --size: 100px;
-  --correct: #6e50b4;
 }
 
 html,
 body {
-  background: #141414;
-  color: #ffffff;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter,
-    Helvetica, Arial, sans-serif;
-}
-
-html, body {
-  background-color: var(--neutral);
-  color: var(--text-main);
+  background-color: var(--neutral, #141414);
+  color: var(--text-main, #ffffff);
   font-family: var(--font-sans);
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -68,13 +57,8 @@ html, body {
   background: rgba(255, 255, 255, 0.4);
 }
 
-button, input, select {
+button,
+input,
+select {
   font-family: inherit;
-}
-.App {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
 }
