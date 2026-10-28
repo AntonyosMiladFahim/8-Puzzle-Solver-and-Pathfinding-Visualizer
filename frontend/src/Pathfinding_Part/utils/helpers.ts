@@ -61,3 +61,11 @@ export const getRandInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
+export const checkStack = (tile: TileType, stack: TileType[]) => {
+  for (const t of stack) {
+    if (isEqual(t, tile)) {
+      return true;
+    }
+  }
+  return false;
+};
