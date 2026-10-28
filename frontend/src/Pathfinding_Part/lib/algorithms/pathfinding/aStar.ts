@@ -1,4 +1,3 @@
-import { WALL_TILE_STYLE } from "../../../utils/constants";
 import { getUntraversedNeighbours } from "../../../utils/getUntraversedNeighbours";
 import { dropFromQueue, isEqual } from "../../../utils/helpers";
 import { initFunctionCost, initHeuristicCost } from "../../../utils/heuristics";
