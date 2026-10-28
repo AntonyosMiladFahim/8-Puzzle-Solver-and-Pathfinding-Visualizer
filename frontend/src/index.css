@@ -21,8 +21,23 @@
 
 * {
   box-sizing: border-box;
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@import "./Pathfinding_Part/pathfinding.css";
+
+:root {
+  --size: 100px;
+  --correct: #6e50b4;
+}
+
+html,
+body {
+  background: #141414;
+  color: #ffffff;
   margin: 0;
   padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter,
+    Helvetica, Arial, sans-serif;
 }
 
 html, body {
@@ -55,4 +70,11 @@ html, body {
 
 button, input, select {
   font-family: inherit;
+}
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 }

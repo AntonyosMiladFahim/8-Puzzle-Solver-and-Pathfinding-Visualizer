@@ -22,3 +22,5 @@ pip-selfcheck.json
 ./node_modules
 /Backend/__pycache__
 /.agent
+.agent
+.venv
