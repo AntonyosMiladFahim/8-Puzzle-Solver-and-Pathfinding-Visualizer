@@ -10,7 +10,7 @@ export const destroyWall = async (
   speed: SpeedType,
 ) => {
   if (isRight && grid[row][col + 1]) {
-    grid[row][col + 1].isWall = true;
+    grid[row][col + 1].isWall = false;
     document.getElementById(`${row}-${col + 1}`)!.className = TILE_STYLE;
     await sleep(20 * SPEEDS.find((s) => s.value == speed)!.value - 5);
   } else if (grid[row + 1]) {
