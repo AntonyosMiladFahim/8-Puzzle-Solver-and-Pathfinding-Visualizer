@@ -24,7 +24,7 @@ app.add_middleware(
 
 @app.post("/solve", response_model=Response)
 def solve(request: PuzzleRequest):
-
+    # initializing the goal state to be used for all requests
     goal: dict[int, tuple[int, int]] = {
         0: (0, 0),
         1: (0, 1),
@@ -37,18 +37,26 @@ def solve(request: PuzzleRequest):
         8: (2, 2),
     }
     intialState = request.state
-    if any(len(r) != 3 for r in intialState) or sorted(v for r in intialState for v in r) != list(range(9)):
-        raise HTTPException(status_code=422, detail="State must be a 3x3 permutation of 0-8.")
+    # checking if diminsions and solvability hold
+    if any(len(r) != 3 for r in intialState) or sorted(
+        v for r in intialState for v in r
+    ) != list(range(9)):
+        raise HTTPException(
+            status_code=422, detail="State must be a 3x3 permutation of 0-8."
+        )
     if not is_solvable(intialState):
         print("Unsolvable")
         raise HTTPException(
             status_code=404, detail="Solution failed: As this state is unsolvable."
         )
     inf = 1000000000000000
+
+    # calling solve wrapper to solve the problem
+
     Response: "Response" = solveWrapper().solve(
         request=request, max_depth=inf, goal=goal
     )
-    print(Response.time_taken)
+    # print(Response.time_taken)
     return Response
 
 

@@ -112,6 +112,7 @@ def A_star(
             next_node.compare_Val = next_node.cost + heuristic_function(next_node, goal)
             next_state_key = json.dumps(next_node.state)
             # only push if this path is better than any known path to the same state
+            # edge relaxation is checked
             if (not (next_state_key in hash_map)) or hash_map.get(
                 next_state_key, (float("inf"))
             ) > next_node.compare_Val:
@@ -186,7 +187,7 @@ def DFS(
         if hash_map.get(current_state_key, float("inf")) <= current_node.depth:
             continue
         hash_map[current_state_key] = current_node.depth
-        
+
         if len(explored_order) < 5000:
             explored_order.append(current_node.state)
 

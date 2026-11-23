@@ -37,6 +37,7 @@ class Node:
     def __lt__(self, other: "Node"):
         return self.compare_Val < other.compare_Val
 
+    # taken in a move that need to be done on the current state and generated the child state from parents
     def move(self, move: Literal["UP", "DOWN", "LEFT", "RIGHT"]) -> "Node":
         vertical_move = -1 if move == "UP" else 1 if move == "DOWN" else 0
         horizontal_move = -1 if move == "LEFT" else 1 if move == "RIGHT" else 0
