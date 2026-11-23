@@ -19,12 +19,15 @@ function App() {
         <div className="navBrand">
           <div className="brandLogo">AI</div>
           <div className="brandText">
-            <span className="brandTitle">Intelligence Lab</span>
+            <span className="brandTitle">Lab 1</span>
             <span className="brandSubtitle">Search & Pathfinding Systems</span>
           </div>
         </div>
 
-        <nav className="modeSwitchGroup" aria-label="Application Module Switcher">
+        <nav
+          className="modeSwitchGroup"
+          aria-label="Application Module Switcher"
+        >
           <button
             type="button"
             className={`modeSwitchBtn ${mode === "puzzle" ? "active" : ""}`}

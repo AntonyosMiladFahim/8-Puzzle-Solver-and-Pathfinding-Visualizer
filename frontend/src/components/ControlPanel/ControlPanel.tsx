@@ -110,7 +110,7 @@ function ControlPanel({
     () => computeInversionInfo(newState),
     [newState],
   );
-
+  // handles the correctness of the state before trying to solve it
   function handle_submit_click(event: React.MouseEvent<HTMLButtonElement>) {
     console.log(event.currentTarget);
     if (newState.length !== 9) {
@@ -266,7 +266,7 @@ function ControlPanel({
             onClick={handle_reset_click}
             disabled={isCalculating}
           >
-            Reset
+            Shuffle
           </button>
 
           {isSolving ? (
